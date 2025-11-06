@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Any, Callable, Dict, Iterable, List, Optional,
 
 if TYPE_CHECKING:
     from hoymiles_modbus.datatypes import PlantData
-    from hoymiles_mqtt.persistence import PersistenceManager
+    from hoymiles_smiles.persistence import PersistenceManager
 
 logger = logging.getLogger(__name__)
 
@@ -252,7 +252,7 @@ class HassMqtt:
             sub_topic = f'{device_serial}/{port}'
         else:
             sub_topic = device_serial
-        return f"{self._topic_prefix}/hoymiles_mqtt/{sub_topic}/state"
+        return f"{self._topic_prefix}/hoymiles_smiles/{sub_topic}/state"
 
     def _get_config_payloads(
         self,
@@ -268,11 +268,11 @@ class HassMqtt:
             config_payload = {
                 "device": {
                     "name": f"{device_name}_{device_serial_number}",
-                    "identifiers": [f"hoymiles_mqtt_{device_serial_number}"],
+                    "identifiers": [f"hoymiles_smiles_{device_serial_number}"],
                     "manufacturer": "Hoymiles",
                 },
                 "name": f'{port_prefix}_{entity_name}' if port_prefix else entity_name,
-                "unique_id": f"hoymiles_mqtt_{entity_prefix}_{device_serial_number}_{entity_name}",
+                "unique_id": f"hoymiles_smiles_{entity_prefix}_{device_serial_number}_{entity_name}",
                 "state_topic": state_topic,
                 "value_template": f"{{{{ iif(value_json.{entity_name} is defined, value_json.{entity_name}, '') }}}}",
                 "availability_topic": state_topic,

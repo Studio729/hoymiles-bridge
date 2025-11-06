@@ -1,4 +1,4 @@
-"""Top-level package for Hoymiles MQTT."""
+"""Top-level package for Hoymiles S-Miles."""
 
 import logging
 
@@ -21,7 +21,7 @@ PORT_ENTITIES = ['pv_voltage', 'pv_current', 'pv_power', 'today_production', 'to
 _main_logger = logging.getLogger(__name__)
 
 # Expose main configuration classes
-from hoymiles_mqtt.config import AppConfig, DatabaseConfig, DtuConfig
+from hoymiles_smiles.config import AppConfig, DatabaseConfig, DtuConfig
 
 __all__ = [
     '__version__',

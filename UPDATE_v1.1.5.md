@@ -192,8 +192,8 @@ The recorder needs to know about the entity **before** we write state to it. By 
 ## Installation
 
 ```bash
-cd /Users/tim/Downloads/hoymiles-mqtt-main
-cp -r custom_components/hoymiles_mqtt /config/custom_components/
+cd /Users/tim/Downloads/hoymiles-smiles-main
+cp -r custom_components/hoymiles_smiles /config/custom_components/
 # Restart Home Assistant
 ```
 

@@ -7,7 +7,7 @@ Hoymiles S-Miles v2.0 represents a major architectural upgrade from the previous
 ## Major Changes
 
 ### 1. Database Migration: SQLite → PostgreSQL
-- **Old**: Data stored in local SQLite database `/data/hoymiles-mqtt.db`
+- **Old**: Data stored in local SQLite database `/data/hoymiles-smiles.db`
 - **New**: Data stored in PostgreSQL database with configurable connection
 - **Benefit**: Better scalability, concurrent access, and data integrity
 
@@ -22,7 +22,7 @@ Hoymiles S-Miles v2.0 represents a major architectural upgrade from the previous
 - **Benefit**: Complete historical data for analysis and trends
 
 ### 4. Component Rename
-- **Old**: `hoymiles_mqtt`
+- **Old**: `hoymiles_smiles`
 - **New**: `hoymiles_smiles`
 
 ## Migration Steps
@@ -31,7 +31,7 @@ Hoymiles S-Miles v2.0 represents a major architectural upgrade from the previous
 If you want to preserve historical data:
 ```bash
 # Backup your SQLite database
-cp data/hoymiles-mqtt.db data/hoymiles-mqtt.db.backup
+cp data/hoymiles-smiles.db data/hoymiles-smiles.db.backup
 ```
 
 ### Step 2: Update Environment Variables
@@ -46,7 +46,7 @@ MQTT_PASSWORD=...
 MQTT_TLS=...
 MQTT_CLIENT_ID=...
 MQTT_TOPIC_PREFIX=...
-DATABASE_PATH=/data/hoymiles-mqtt.db
+DATABASE_PATH=/data/hoymiles-smiles.db
 ```
 
 **Add:**
@@ -88,7 +88,7 @@ The new setup includes:
 
 2. Delete old custom component:
    ```bash
-   rm -rf /config/custom_components/hoymiles_mqtt
+   rm -rf /config/custom_components/hoymiles_smiles
    ```
 
 3. Install new component:
@@ -172,7 +172,7 @@ All historical data is retained permanently (no automatic purging).
 
 ## Breaking Changes
 
-1. **Integration Name**: `hoymiles_mqtt` → `hoymiles_smiles`
+1. **Integration Name**: `hoymiles_smiles` → `hoymiles_smiles`
 2. **Default Port**: Changed from 8090 to 8080
 3. **Database**: SQLite → PostgreSQL (requires migration)
 4. **MQTT**: Completely removed
@@ -209,7 +209,7 @@ A: Yes! Set `DB_HOST` to your PostgreSQL server address.
 A: No longer needed. The Home Assistant integration queries the bridge API directly.
 
 **Q: Will my automation continue to work?**
-A: Entity IDs will change (domain changed from `hoymiles_mqtt` to `hoymiles_smiles`). Update your automations accordingly.
+A: Entity IDs will change (domain changed from `hoymiles_smiles` to `hoymiles_smiles`). Update your automations accordingly.
 
 **Q: Can I still use Prometheus for monitoring?**
 A: Yes! The `/metrics` endpoint still works.

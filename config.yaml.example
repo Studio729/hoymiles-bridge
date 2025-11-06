@@ -1,4 +1,4 @@
-# Hoymiles MQTT Configuration File Example
+# Hoymiles S-Miles Configuration File Example
 # This file supports more advanced configurations like multiple DTUs
 # Place this file at ./config/config.yaml when using Docker
 
@@ -8,7 +8,7 @@ mqtt_port: 1883
 mqtt_user: null
 mqtt_password: null
 mqtt_tls: false
-mqtt_client_id: hoymiles-mqtt
+mqtt_client_id: hoymiles-smiles
 mqtt_topic_prefix: homeassistant
 
 # ===== Multiple DTU Configuration =====
@@ -84,7 +84,7 @@ entity_friendly_names: {}
 
 # ===== Persistence =====
 persistence_enabled: true
-database_path: "/data/hoymiles-mqtt.db"
+database_path: "/data/hoymiles-smiles.db"
 
 # ===== Health Monitoring =====
 health_enabled: true

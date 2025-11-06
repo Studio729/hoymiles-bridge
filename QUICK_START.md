@@ -9,9 +9,9 @@
 version: "3"
 
 services:
-  hoymiles_mqtt:
-    container_name: hoymiles_mqtt
-    image: hoymiles_mqtt
+  hoymiles_smiles:
+    container_name: hoymiles_smiles
+    image: hoymiles_smiles
     network_mode: host
     environment:
       # Required
@@ -26,7 +26,7 @@ services:
       LOG_LEVEL: INFO
       LOG_TO_CONSOLE: true
       PERSISTENCE_ENABLED: true
-      DATABASE_PATH: /data/hoymiles-mqtt.db
+      DATABASE_PATH: /data/hoymiles-smiles.db
       
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8090/ready"]
@@ -43,13 +43,13 @@ services:
 
 2. **Build and run**:
 ```bash
-docker build https://github.com/wasilukm/hoymiles-mqtt.git#v0.12.0 -t hoymiles_mqtt
+docker build https://github.com/wasilukm/hoymiles-smiles.git#v0.12.0 -t hoymiles_smiles
 docker-compose up -d
 ```
 
 3. **Verify**:
 ```bash
-docker logs hoymiles_mqtt
+docker logs hoymiles_smiles
 curl http://localhost:8090/health
 ```
 
@@ -59,12 +59,12 @@ curl http://localhost:8090/health
 
 1. **Install**:
 ```bash
-pip install hoymiles-mqtt
+pip install hoymiles-smiles
 ```
 
 2. **Run**:
 ```bash
-python3 -m hoymiles_mqtt \
+python3 -m hoymiles_smiles \
   --mqtt-broker 192.168.1.31 \
   --dtu-host 192.168.1.191 \
   --log-to-console \
@@ -81,7 +81,7 @@ python3 -m hoymiles_mqtt \
 
 1. **Install**:
 ```bash
-cd /Users/tim/Downloads/hoymiles-mqtt-main
+cd /Users/tim/Downloads/hoymiles-smiles-main
 ./install_v1.1.sh
 ```
 
@@ -147,7 +147,7 @@ sensor:
 
 ### After Start
 - [ ] Container is running: `docker ps`
-- [ ] No errors in logs: `docker logs hoymiles_mqtt`
+- [ ] No errors in logs: `docker logs hoymiles_smiles`
 - [ ] Health endpoint responds: `curl http://localhost:8090/health`
 - [ ] DTU queries working (check logs)
 - [ ] MQTT messages publishing (check MQTT broker)
@@ -165,8 +165,8 @@ sensor:
 
 ```bash
 # View logs
-docker logs hoymiles_mqtt
-docker logs -f hoymiles_mqtt  # Follow
+docker logs hoymiles_smiles
+docker logs -f hoymiles_smiles  # Follow
 
 # Check health
 curl http://localhost:8090/health | jq
@@ -174,7 +174,7 @@ curl http://localhost:8090/stats | jq
 curl http://localhost:8090/metrics
 
 # Restart
-docker restart hoymiles_mqtt
+docker restart hoymiles_smiles
 
 # Debug mode
 docker-compose down
@@ -190,7 +190,7 @@ mosquitto_sub -h 192.168.1.31 -t "homeassistant/#" -v
 
 ### Container unhealthy
 - Check `HEALTH_PORT` matches in environment and healthcheck
-- Verify health endpoint: `docker exec hoymiles_mqtt curl -f http://localhost:8090/health`
+- Verify health endpoint: `docker exec hoymiles_smiles curl -f http://localhost:8090/health`
 
 ### No data in Home Assistant
 - Verify MQTT broker is running

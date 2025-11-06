@@ -14,7 +14,7 @@ views:
       - type: horizontal-stack
         cards:
           - type: entity
-            entity: binary_sensor.hoymiles_mqtt_healthy
+            entity: binary_sensor.hoymiles_smiles_healthy
             name: Health
             icon: mdi:heart-pulse
           - type: entity
@@ -22,7 +22,7 @@ views:
             name: DTU
             icon: mdi:solar-power
           - type: entity
-            entity: sensor.hoymiles_mqtt_uptime_formatted
+            entity: sensor.hoymiles_smiles_uptime_formatted
             name: Uptime
             icon: mdi:clock-check
 
@@ -31,14 +31,14 @@ views:
         title: 🏥 Application Health
         state_color: true
         entities:
-          - entity: binary_sensor.hoymiles_mqtt_healthy
+          - entity: binary_sensor.hoymiles_smiles_healthy
             name: Overall Status
             type: attribute
             attribute: last_changed
             format: relative
             secondary_info: last-changed
           - type: divider
-          - entity: sensor.hoymiles_mqtt_uptime_formatted
+          - entity: sensor.hoymiles_smiles_uptime_formatted
             name: Running For
             icon: mdi:timer-outline
           - entity: sensor.hoymiles_dtu_last_query
@@ -68,16 +68,16 @@ views:
       - type: entities
         title: 📡 MQTT Activity
         entities:
-          - entity: sensor.hoymiles_mqtt_messages_published
+          - entity: sensor.hoymiles_smiles_messages_published
             name: Messages Published
             icon: mdi:message-arrow-right
             secondary_info: last-changed
-          - entity: sensor.hoymiles_mqtt_errors
+          - entity: sensor.hoymiles_smiles_errors
             name: MQTT Errors
             icon: mdi:message-alert
           - type: custom:mini-graph-card
             entities:
-              - entity: sensor.hoymiles_mqtt_messages_published
+              - entity: sensor.hoymiles_smiles_messages_published
                 name: Message Rate
                 show_state: true
             hours_to_show: 24
@@ -92,10 +92,10 @@ views:
       - type: entities
         title: 💾 Database
         entities:
-          - entity: sensor.hoymiles_mqtt_database_size
+          - entity: sensor.hoymiles_smiles_database_size
             name: Size
             icon: mdi:database
-          - entity: sensor.hoymiles_mqtt_cached_records
+          - entity: sensor.hoymiles_smiles_cached_records
             name: Cached Records
             icon: mdi:database-clock
 
@@ -119,12 +119,12 @@ views:
         title: MQTT Messages (24h)
         hours_to_show: 24
         entities:
-          - entity: sensor.hoymiles_mqtt_messages_published
+          - entity: sensor.hoymiles_smiles_messages_published
             name: Published
 
       # Uptime Statistics
       - type: statistic
-        entity: sensor.hoymiles_mqtt_uptime
+        entity: sensor.hoymiles_smiles_uptime
         name: Average Uptime
         stat_type: mean
         period:
@@ -143,11 +143,11 @@ views:
               - entity: sensor.hoymiles_dtu_error_count
                 name: Errors
           - type: custom:multiple-entity-row
-            entity: sensor.hoymiles_mqtt_messages_published
+            entity: sensor.hoymiles_smiles_messages_published
             name: MQTT Messages
             secondary_info: last-changed
             entities:
-              - entity: sensor.hoymiles_mqtt_errors
+              - entity: sensor.hoymiles_smiles_errors
                 name: Errors
 
       # Mini graphs
@@ -169,7 +169,7 @@ views:
 
           - type: custom:mini-graph-card
             entities:
-              - entity: sensor.hoymiles_mqtt_database_size
+              - entity: sensor.hoymiles_smiles_database_size
                 name: DB Size
             hours_to_show: 168
             line_width: 2
@@ -189,7 +189,7 @@ views:
       # Active Issues
       - type: conditional
         conditions:
-          - entity: binary_sensor.hoymiles_mqtt_healthy
+          - entity: binary_sensor.hoymiles_smiles_healthy
             state: "off"
         card:
           type: markdown
@@ -212,7 +212,7 @@ views:
           - entity: sensor.hoymiles_dtu_error_count
             name: DTU Query Errors
             icon: mdi:alert-circle
-          - entity: sensor.hoymiles_mqtt_errors
+          - entity: sensor.hoymiles_smiles_errors
             name: MQTT Errors
             icon: mdi:message-alert
           - type: divider
@@ -226,7 +226,7 @@ views:
       # Recent Activity Timeline
       - type: logbook
         entities:
-          - binary_sensor.hoymiles_mqtt_healthy
+          - binary_sensor.hoymiles_smiles_healthy
           - sensor.hoymiles_dtu_status
         hours_to_show: 24
         title: Recent Status Changes
@@ -242,9 +242,9 @@ views:
         content: |
           ### Application Status
           
-          **Health:** {{ states('binary_sensor.hoymiles_mqtt_healthy') }}
-          **Uptime:** {{ states('sensor.hoymiles_mqtt_uptime_formatted') }}
-          **Start Time:** {{ state_attr('sensor.hoymiles_mqtt_health_status', 'start_time') }}
+          **Health:** {{ states('binary_sensor.hoymiles_smiles_healthy') }}
+          **Uptime:** {{ states('sensor.hoymiles_smiles_uptime_formatted') }}
+          **Start Time:** {{ state_attr('sensor.hoymiles_smiles_health_status', 'start_time') }}
           
           ### DTU Connection
           
@@ -255,28 +255,28 @@ views:
           
           ### MQTT Stats
           
-          **Messages Published:** {{ states('sensor.hoymiles_mqtt_messages_published') }}
-          **Errors:** {{ states('sensor.hoymiles_mqtt_errors') }}
+          **Messages Published:** {{ states('sensor.hoymiles_smiles_messages_published') }}
+          **Errors:** {{ states('sensor.hoymiles_smiles_errors') }}
           
           ### Database
           
-          **Size:** {{ states('sensor.hoymiles_mqtt_database_size') }} MB
-          **Cached Records:** {{ states('sensor.hoymiles_mqtt_cached_records') }}
+          **Size:** {{ states('sensor.hoymiles_smiles_database_size') }} MB
+          **Cached Records:** {{ states('sensor.hoymiles_smiles_cached_records') }}
 
       # Raw Data Card
       - type: entities
         title: 🔍 Raw Sensor Data
         entities:
-          - entity: sensor.hoymiles_mqtt_health_status
+          - entity: sensor.hoymiles_smiles_health_status
             type: attribute
             attribute: dtus
-          - entity: sensor.hoymiles_mqtt_health_status
+          - entity: sensor.hoymiles_smiles_health_status
             type: attribute
             attribute: mqtt
-          - entity: sensor.hoymiles_mqtt_health_status
+          - entity: sensor.hoymiles_smiles_health_status
             type: attribute
             attribute: uptime_seconds
-          - entity: sensor.hoymiles_mqtt_health_status
+          - entity: sensor.hoymiles_smiles_health_status
             type: attribute
             attribute: start_time
 
@@ -298,14 +298,14 @@ views:
         title: ℹ️ System Info
         entities:
           - type: attribute
-            entity: sensor.hoymiles_mqtt_health_status
+            entity: sensor.hoymiles_smiles_health_status
             attribute: start_time
             name: Started At
             icon: mdi:clock-start
-          - entity: sensor.hoymiles_mqtt_uptime
+          - entity: sensor.hoymiles_smiles_uptime
             name: Uptime (seconds)
             icon: mdi:timer
-          - entity: sensor.hoymiles_mqtt_database_size
+          - entity: sensor.hoymiles_smiles_database_size
             name: Database Size
             icon: mdi:database
 

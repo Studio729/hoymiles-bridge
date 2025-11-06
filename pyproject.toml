@@ -19,7 +19,7 @@ classifiers=[
     'Programming Language :: Python :: 3.13',
 ]
 packages = [
-    { include = "hoymiles_mqtt" },
+    { include = "hoymiles_smiles" },
     { include = "custom_components/hoymiles_smiles" },
     { include = "tests", format = "sdist" },
 ]

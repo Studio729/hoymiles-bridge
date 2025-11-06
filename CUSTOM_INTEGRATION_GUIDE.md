@@ -31,7 +31,7 @@ This is a **native Home Assistant custom integration** for monitoring your Hoymi
 ### File Structure
 
 ```
-custom_components/hoymiles_mqtt/
+custom_components/hoymiles_smiles/
 ├── __init__.py              # Integration setup and entry point
 ├── manifest.json            # Integration metadata
 ├── const.py                 # Constants and sensor definitions
@@ -52,7 +52,7 @@ Defines the integration's identity and requirements based on [manifest documenta
 
 ```json
 {
-  "domain": "hoymiles_mqtt",
+  "domain": "hoymiles_smiles",
   "name": "Hoymiles MQTT Bridge",
   "config_flow": true,
   "iot_class": "local_polling",
@@ -269,9 +269,9 @@ Entities follow Home Assistant naming standards:
 
 ### Examples
 ```
-sensor.hoymiles_mqtt_bridge_uptime
-sensor.hoymiles_mqtt_bridge_mqtt_messages_published
-binary_sensor.hoymiles_mqtt_bridge_application_healthy
+sensor.hoymiles_smiles_bridge_uptime
+sensor.hoymiles_smiles_bridge_mqtt_messages_published
+binary_sensor.hoymiles_smiles_bridge_application_healthy
 ```
 
 ### Unique IDs
@@ -385,7 +385,7 @@ Currently hardcoded to "DTU". To support multiple:
 1. **Install integration**
 2. **Verify entities created**:
    - Developer Tools → States
-   - Search for "hoymiles_mqtt_bridge"
+   - Search for "hoymiles_smiles_bridge"
 3. **Check values updating**:
    - Watch entity states
    - Refresh should fetch new data
@@ -420,13 +420,13 @@ In `configuration.yaml`:
 logger:
   default: warning
   logs:
-    custom_components.hoymiles_mqtt: debug
+    custom_components.hoymiles_smiles: debug
 ```
 
 ### Common Issues
 
 #### "Integration not found"
-- Check files are in `/config/custom_components/hoymiles_mqtt/`
+- Check files are in `/config/custom_components/hoymiles_smiles/`
 - Verify `manifest.json` is valid JSON
 - Restart HA
 

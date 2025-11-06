@@ -23,8 +23,8 @@ Added comprehensive debug logging to track API calls and diagnose intermittent u
 
 ### Quick Update
 ```bash
-cd /Users/tim/Downloads/hoymiles-mqtt-main
-cp -r custom_components/hoymiles_mqtt /config/custom_components/
+cd /Users/tim/Downloads/hoymiles-smiles-main
+cp -r custom_components/hoymiles_smiles /config/custom_components/
 ```
 
 ### Clear Home Assistant Cache
@@ -55,8 +55,8 @@ Add to `configuration.yaml`:
 logger:
   default: warning
   logs:
-    custom_components.hoymiles_mqtt: debug
-    custom_components.hoymiles_mqtt.coordinator: debug
+    custom_components.hoymiles_smiles: debug
+    custom_components.hoymiles_smiles.coordinator: debug
 ```
 
 **Restart Home Assistant**
@@ -157,7 +157,7 @@ Compare failures in this test with "unavailable" events in HA.
 
 ### Check Bridge Container Logs
 ```bash
-docker logs -f hoymiles_mqtt --tail 100
+docker logs -f hoymiles_smiles --tail 100
 ```
 
 Look for:
@@ -246,7 +246,7 @@ If icon still doesn't show after update:
 
 1. **Verify files exist**:
    ```bash
-   ls -lh /config/custom_components/hoymiles_mqtt/icon*.png
+   ls -lh /config/custom_components/hoymiles_smiles/icon*.png
    ```
    Should show:
    - `icon.png` (20K, 256x256)
@@ -254,7 +254,7 @@ If icon still doesn't show after update:
 
 2. **Check file permissions**:
    ```bash
-   chmod 644 /config/custom_components/hoymiles_mqtt/icon*.png
+   chmod 644 /config/custom_components/hoymiles_smiles/icon*.png
    ```
 
 3. **Delete integration cache**:

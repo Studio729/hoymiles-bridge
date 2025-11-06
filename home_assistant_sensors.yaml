@@ -8,7 +8,7 @@ rest:
     scan_interval: 60  # Check every 60 seconds
     sensor:
       - name: "Hoymiles MQTT Health Status"
-        unique_id: hoymiles_mqtt_health_status
+        unique_id: hoymiles_smiles_health_status
         value_template: "{{ value_json.healthy }}"
         json_attributes:
           - uptime_seconds
@@ -18,7 +18,7 @@ rest:
         availability: "{{ value_json is defined }}"
       
       - name: "Hoymiles MQTT Uptime"
-        unique_id: hoymiles_mqtt_uptime
+        unique_id: hoymiles_smiles_uptime
         value_template: "{{ value_json.uptime_seconds }}"
         unit_of_measurement: "s"
         device_class: duration
@@ -26,13 +26,13 @@ rest:
         availability: "{{ value_json.uptime_seconds is defined }}"
       
       - name: "Hoymiles MQTT Messages Published"
-        unique_id: hoymiles_mqtt_messages_published
+        unique_id: hoymiles_smiles_messages_published
         value_template: "{{ value_json.mqtt.messages_published }}"
         state_class: total_increasing
         availability: "{{ value_json.mqtt.messages_published is defined }}"
       
       - name: "Hoymiles MQTT Errors"
-        unique_id: hoymiles_mqtt_errors
+        unique_id: hoymiles_smiles_errors
         value_template: "{{ value_json.mqtt.errors }}"
         state_class: total_increasing
         availability: "{{ value_json.mqtt.errors is defined }}"
@@ -41,7 +41,7 @@ rest:
     scan_interval: 300  # Check every 5 minutes
     sensor:
       - name: "Hoymiles MQTT Database Size"
-        unique_id: hoymiles_mqtt_db_size
+        unique_id: hoymiles_smiles_db_size
         value_template: "{{ (value_json.database_size_bytes / 1024 / 1024) | round(2) }}"
         unit_of_measurement: "MB"
         state_class: measurement
@@ -49,7 +49,7 @@ rest:
         availability: "{{ value_json.database_size_bytes is defined }}"
       
       - name: "Hoymiles MQTT Cached Records"
-        unique_id: hoymiles_mqtt_cached_records
+        unique_id: hoymiles_smiles_cached_records
         value_template: "{{ value_json.total_records }}"
         state_class: measurement
         availability: "{{ value_json.total_records is defined }}"
@@ -59,14 +59,14 @@ template:
   # Binary sensor for overall health
   - binary_sensor:
       - name: "Hoymiles MQTT Healthy"
-        unique_id: hoymiles_mqtt_healthy
+        unique_id: hoymiles_smiles_healthy
         device_class: connectivity
         state: >-
-          {{ states('sensor.hoymiles_mqtt_health_status') == 'True' }}
+          {{ states('sensor.hoymiles_smiles_health_status') == 'True' }}
         availability: >-
-          {{ states('sensor.hoymiles_mqtt_health_status') not in ['unknown', 'unavailable', 'none'] }}
+          {{ states('sensor.hoymiles_smiles_health_status') not in ['unknown', 'unavailable', 'none'] }}
         icon: >-
-          {% if states('sensor.hoymiles_mqtt_health_status') == 'True' %}
+          {% if states('sensor.hoymiles_smiles_health_status') == 'True' %}
             mdi:check-circle
           {% else %}
             mdi:alert-circle
@@ -77,7 +77,7 @@ template:
       - name: "Hoymiles DTU Last Query"
         unique_id: hoymiles_dtu_last_query
         state: >-
-          {% set dtus = state_attr('sensor.hoymiles_mqtt_health_status', 'dtus') %}
+          {% set dtus = state_attr('sensor.hoymiles_smiles_health_status', 'dtus') %}
           {% if dtus and dtus.DTU %}
             {{ dtus.DTU.seconds_since_last_success | default(0) }}
           {% else %}
@@ -87,12 +87,12 @@ template:
         device_class: duration
         icon: mdi:clock-outline
         availability: >-
-          {{ state_attr('sensor.hoymiles_mqtt_health_status', 'dtus') is not none }}
+          {{ state_attr('sensor.hoymiles_smiles_health_status', 'dtus') is not none }}
       
       - name: "Hoymiles DTU Query Count"
         unique_id: hoymiles_dtu_query_count
         state: >-
-          {% set dtus = state_attr('sensor.hoymiles_mqtt_health_status', 'dtus') %}
+          {% set dtus = state_attr('sensor.hoymiles_smiles_health_status', 'dtus') %}
           {% if dtus and dtus.DTU %}
             {{ dtus.DTU.query_count | default(0) }}
           {% else %}
@@ -101,12 +101,12 @@ template:
         state_class: total_increasing
         icon: mdi:counter
         availability: >-
-          {{ state_attr('sensor.hoymiles_mqtt_health_status', 'dtus') is not none }}
+          {{ state_attr('sensor.hoymiles_smiles_health_status', 'dtus') is not none }}
       
       - name: "Hoymiles DTU Error Count"
         unique_id: hoymiles_dtu_error_count
         state: >-
-          {% set dtus = state_attr('sensor.hoymiles_mqtt_health_status', 'dtus') %}
+          {% set dtus = state_attr('sensor.hoymiles_smiles_health_status', 'dtus') %}
           {% if dtus and dtus.DTU %}
             {{ dtus.DTU.error_count | default(0) }}
           {% else %}
@@ -115,12 +115,12 @@ template:
         state_class: total_increasing
         icon: mdi:alert-circle-outline
         availability: >-
-          {{ state_attr('sensor.hoymiles_mqtt_health_status', 'dtus') is not none }}
+          {{ state_attr('sensor.hoymiles_smiles_health_status', 'dtus') is not none }}
       
       - name: "Hoymiles DTU Status"
         unique_id: hoymiles_dtu_status
         state: >-
-          {% set dtus = state_attr('sensor.hoymiles_mqtt_health_status', 'dtus') %}
+          {% set dtus = state_attr('sensor.hoymiles_smiles_health_status', 'dtus') %}
           {% if dtus and dtus.DTU %}
             {{ dtus.DTU.status | default('unknown') }}
           {% else %}
@@ -128,12 +128,12 @@ template:
           {% endif %}
         icon: mdi:solar-power
         availability: >-
-          {{ state_attr('sensor.hoymiles_mqtt_health_status', 'dtus') is not none }}
+          {{ state_attr('sensor.hoymiles_smiles_health_status', 'dtus') is not none }}
       
       - name: "Hoymiles MQTT Uptime Formatted"
-        unique_id: hoymiles_mqtt_uptime_formatted
+        unique_id: hoymiles_smiles_uptime_formatted
         state: >-
-          {% set uptime = states('sensor.hoymiles_mqtt_uptime') | int(0) %}
+          {% set uptime = states('sensor.hoymiles_smiles_uptime') | int(0) %}
           {% if uptime > 0 %}
             {% set days = (uptime / 86400) | int %}
             {% set hours = ((uptime % 86400) / 3600) | int %}
@@ -150,18 +150,18 @@ template:
           {% endif %}
         icon: mdi:clock-check-outline
         availability: >-
-          {{ states('sensor.hoymiles_mqtt_uptime') not in ['unknown', 'unavailable', 'none'] }}
+          {{ states('sensor.hoymiles_smiles_uptime') not in ['unknown', 'unavailable', 'none'] }}
 
 # Automations (Modern HA 2024.x syntax)
 automation:
   # Alert when Hoymiles MQTT goes unhealthy
-  - id: hoymiles_mqtt_unhealthy_alert
+  - id: hoymiles_smiles_unhealthy_alert
     alias: "Hoymiles MQTT - Unhealthy Alert"
     description: "Alert when Hoymiles MQTT application becomes unhealthy"
     mode: single
     trigger:
       - platform: state
-        entity_id: binary_sensor.hoymiles_mqtt_healthy
+        entity_id: binary_sensor.hoymiles_smiles_healthy
         to: "off"
         for:
           minutes: 2
@@ -185,7 +185,7 @@ automation:
       #       priority: high
 
   # Alert on high error rate
-  - id: hoymiles_mqtt_high_errors
+  - id: hoymiles_smiles_high_errors
     alias: "Hoymiles MQTT - High Error Rate"
     description: "Alert when error count increases significantly"
     mode: single
@@ -206,13 +206,13 @@ automation:
             Increase: {{ trigger.to_state.state | int(0) - trigger.from_state.state | int(0) }}
 
   # Notify when application restarts
-  - id: hoymiles_mqtt_restart_notify
+  - id: hoymiles_smiles_restart_notify
     alias: "Hoymiles MQTT - Restart Notification"
     description: "Notify when application restarts"
     mode: single
     trigger:
       - platform: state
-        entity_id: sensor.hoymiles_mqtt_uptime
+        entity_id: sensor.hoymiles_smiles_uptime
     condition:
       - condition: template
         value_template: >-
@@ -225,4 +225,4 @@ automation:
           message: >-
             Hoymiles MQTT application has restarted.
             Previous uptime: {{ trigger.from_state.state }}s
-            New start time: {{ state_attr('sensor.hoymiles_mqtt_health_status', 'start_time') }}
+            New start time: {{ state_attr('sensor.hoymiles_smiles_health_status', 'start_time') }}

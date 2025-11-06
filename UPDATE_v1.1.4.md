@@ -129,7 +129,7 @@ These values are tuned based on typical bridge behavior. You don't need to chang
 3. **Expected**: Still succeeds on first submit (auto-retry handles it)
 
 ### Test 3: Bridge Actually Down
-1. Stop bridge container: `docker stop hoymiles_mqtt`
+1. Stop bridge container: `docker stop hoymiles_smiles`
 2. Try adding integration
 3. **Expected**: Error after 3 attempts (~6 seconds): "Cannot connect to Hoymiles MQTT health API"
 
@@ -152,8 +152,8 @@ These values are tuned based on typical bridge behavior. You don't need to chang
 ## Installation
 
 ```bash
-cd /Users/tim/Downloads/hoymiles-mqtt-main
-cp -r custom_components/hoymiles_mqtt /config/custom_components/
+cd /Users/tim/Downloads/hoymiles-smiles-main
+cp -r custom_components/hoymiles_smiles /config/custom_components/
 # Restart Home Assistant
 ```
 
@@ -161,10 +161,10 @@ cp -r custom_components/hoymiles_mqtt /config/custom_components/
 
 ## Files Modified
 
-- `custom_components/hoymiles_mqtt/config_flow.py` - Added retry logic
-- `custom_components/hoymiles_mqtt/manifest.json` - Version 1.1.4
-- `custom_components/hoymiles_mqtt/binary_sensor.py` - Version 1.1.4
-- `custom_components/hoymiles_mqtt/sensor.py` - Version 1.1.4
+- `custom_components/hoymiles_smiles/config_flow.py` - Added retry logic
+- `custom_components/hoymiles_smiles/manifest.json` - Version 1.1.4
+- `custom_components/hoymiles_smiles/binary_sensor.py` - Version 1.1.4
+- `custom_components/hoymiles_smiles/sensor.py` - Version 1.1.4
 
 ---
 

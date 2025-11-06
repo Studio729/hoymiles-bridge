@@ -1,16 +1,16 @@
 # Hoymiles MQTT
 
-[![pypi](https://img.shields.io/pypi/v/hoymiles-mqtt.svg)](https://pypi.org/project/hoymiles-mqtt/)
-[![python](https://img.shields.io/pypi/pyversions/hoymiles-mqtt.svg)](https://pypi.org/project/hoymiles-mqtt/)
-[![Build Status](https://github.com/wasilukm/hoymiles-mqtt/actions/workflows/dev.yml/badge.svg)](https://github.com/wasilukm/hoymiles-mqtt/actions/workflows/dev.yml)
-[![codecov](https://codecov.io/gh/wasilukm/hoymiles-mqtt/branch/main/graphs/badge.svg)](https://codecov.io/github/wasilukm/hoymiles-mqtt)
+[![pypi](https://img.shields.io/pypi/v/hoymiles-smiles.svg)](https://pypi.org/project/hoymiles-smiles/)
+[![python](https://img.shields.io/pypi/pyversions/hoymiles-smiles.svg)](https://pypi.org/project/hoymiles-smiles/)
+[![Build Status](https://github.com/wasilukm/hoymiles-smiles/actions/workflows/dev.yml/badge.svg)](https://github.com/wasilukm/hoymiles-smiles/actions/workflows/dev.yml)
+[![codecov](https://codecov.io/gh/wasilukm/hoymiles-smiles/branch/main/graphs/badge.svg)](https://codecov.io/github/wasilukm/hoymiles-smiles)
 
 **Send data from Hoymiles photovoltaic installation to Home Assistant through MQTT broker.**
 
 *Disclaimer: This is an independent project, not affiliated with Hoymiles. Any trademarks or product names mentioned are the property of their respective owners.*
 
-* **GitHub**: <https://github.com/wasilukm/hoymiles-mqtt>
-* **PyPI**: <https://pypi.org/project/hoymiles-mqtt/>
+* **GitHub**: <https://github.com/wasilukm/hoymiles-smiles>
+* **PyPI**: <https://pypi.org/project/hoymiles-smiles/>
 * **License**: MIT
 
 ---
@@ -64,13 +64,13 @@ See **[QUICK_START.md](QUICK_START.md)** for detailed setup.
 
 ### Python Package
 ```bash
-pip install hoymiles-mqtt
-python3 -m hoymiles_mqtt --mqtt-broker 192.168.1.31 --dtu-host 192.168.1.191
+pip install hoymiles-smiles
+python3 -m hoymiles_smiles --mqtt-broker 192.168.1.31 --dtu-host 192.168.1.191
 ```
 
 ### Home Assistant Custom Integration
 ```bash
-cd /path/to/hoymiles-mqtt-main
+cd /path/to/hoymiles-smiles-main
 ./install_v1.1.sh
 ```
 
@@ -123,7 +123,7 @@ environment:
 
 ### Command Line
 ```bash
-python3 -m hoymiles_mqtt \
+python3 -m hoymiles_smiles \
   --mqtt-broker 192.168.1.31 \
   --dtu-host 192.168.1.191 \
   --query-period 300 \
@@ -131,7 +131,7 @@ python3 -m hoymiles_mqtt \
   --log-to-console
 ```
 
-**Full options**: Run `python3 -m hoymiles_mqtt --help`
+**Full options**: Run `python3 -m hoymiles_smiles --help`
 
 ---
 
@@ -146,7 +146,7 @@ python3 -m hoymiles_mqtt \
 | **[WEB_SERVER_CONFIG.md](WEB_SERVER_CONFIG.md)** | Health endpoint configuration |
 | **[DOCKER_COMPOSE_GUIDE.md](DOCKER_COMPOSE_GUIDE.md)** | Advanced Docker setup |
 | **[UPGRADE_v0.12.md](UPGRADE_v0.12.md)** | v0.12 features and migration |
-| **[custom_components/hoymiles_mqtt/README.md](custom_components/hoymiles_mqtt/README.md)** | Custom integration docs |
+| **[custom_components/hoymiles_smiles/README.md](custom_components/hoymiles_smiles/README.md)** | Custom integration docs |
 
 ---
 
@@ -175,7 +175,7 @@ Verify `HEALTH_PORT` matches in both environment variable and healthcheck comman
 ### No Data in Home Assistant
 1. Ensure inverters are online (daylight hours)
 2. Check MQTT broker is running
-3. Verify container logs: `docker logs hoymiles_mqtt`
+3. Verify container logs: `docker logs hoymiles_smiles`
 4. Test MQTT: `mosquitto_sub -h <broker> -t "homeassistant/#"`
 
 **More help**: See **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)**
@@ -204,9 +204,9 @@ Verify `HEALTH_PORT` matches in both environment variable and healthcheck comman
 ```yaml
 version: "3"
 services:
-  hoymiles_mqtt:
-    container_name: hoymiles_mqtt
-    image: hoymiles_mqtt
+  hoymiles_smiles:
+    container_name: hoymiles_smiles
+    image: hoymiles_smiles
     network_mode: host
     environment:
       MQTT_BROKER: 192.168.1.31
@@ -248,8 +248,8 @@ curl http://localhost:8090/ready     # Readiness probe
 
 ### Logs
 ```bash
-docker logs hoymiles_mqtt
-docker logs -f hoymiles_mqtt  # Follow mode
+docker logs hoymiles_smiles
+docker logs -f hoymiles_smiles  # Follow mode
 ```
 
 ---
@@ -263,13 +263,13 @@ make test
 
 ### Build Docker Image
 ```bash
-docker build -t hoymiles_mqtt .
+docker build -t hoymiles_smiles .
 ```
 
 ### Install from Source
 ```bash
-git clone https://github.com/wasilukm/hoymiles-mqtt.git
-cd hoymiles-mqtt
+git clone https://github.com/wasilukm/hoymiles-smiles.git
+cd hoymiles-smiles
 pip install -e .
 ```
 
@@ -284,7 +284,7 @@ This package was created with [Cookiecutter](https://github.com/audreyr/cookiecu
 ## Support
 
 - **Documentation**: See guides in this repository
-- **Issues**: [GitHub Issues](https://github.com/wasilukm/hoymiles-mqtt/issues)
+- **Issues**: [GitHub Issues](https://github.com/wasilukm/hoymiles-smiles/issues)
 - **Community**: See discussions and pull requests
 
 ---

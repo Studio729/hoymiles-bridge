@@ -207,7 +207,7 @@ Available metrics:
 - `hoymiles_inverter_temperature_celsius` - Inverter temperature
 - `hoymiles_today_production_wh` - Today's production
 - `hoymiles_total_production_wh` - Total production
-- `hoymiles_mqtt_uptime_seconds` - Application uptime
+- `hoymiles_smiles_uptime_seconds` - Application uptime
 
 ## Migration from v1.x
 

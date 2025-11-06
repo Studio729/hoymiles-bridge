@@ -55,7 +55,7 @@ All entities are grouped under:
 Copy this folder to your Home Assistant `custom_components` directory:
 
 ```bash
-cp -r hoymiles_mqtt/ /config/custom_components/
+cp -r hoymiles_smiles/ /config/custom_components/
 ```
 
 ### 2. Restart Home Assistant
@@ -108,15 +108,15 @@ After installation, click **CONFIGURE** to adjust:
 Entities follow this naming convention:
 
 ```
-sensor.hoymiles_mqtt_bridge_uptime
-sensor.hoymiles_mqtt_bridge_mqtt_messages_published
-sensor.hoymiles_mqtt_bridge_mqtt_errors
-sensor.hoymiles_mqtt_bridge_dtu_query_count
-sensor.hoymiles_mqtt_bridge_dtu_error_count
-sensor.hoymiles_mqtt_bridge_dtu_last_query
-sensor.hoymiles_mqtt_bridge_database_size
-sensor.hoymiles_mqtt_bridge_cached_records
-binary_sensor.hoymiles_mqtt_bridge_application_healthy
+sensor.hoymiles_smiles_bridge_uptime
+sensor.hoymiles_smiles_bridge_mqtt_messages_published
+sensor.hoymiles_smiles_bridge_mqtt_errors
+sensor.hoymiles_smiles_bridge_dtu_query_count
+sensor.hoymiles_smiles_bridge_dtu_error_count
+sensor.hoymiles_smiles_bridge_dtu_last_query
+sensor.hoymiles_smiles_bridge_database_size
+sensor.hoymiles_smiles_bridge_cached_records
+binary_sensor.hoymiles_smiles_bridge_application_healthy
 ```
 
 ---
@@ -127,11 +127,11 @@ binary_sensor.hoymiles_mqtt_bridge_application_healthy
 type: entities
 title: Hoymiles MQTT Bridge
 entities:
-  - entity: binary_sensor.hoymiles_mqtt_bridge_application_healthy
-  - entity: sensor.hoymiles_mqtt_bridge_uptime
-  - entity: sensor.hoymiles_mqtt_bridge_dtu_last_query
-  - entity: sensor.hoymiles_mqtt_bridge_mqtt_messages_published
-  - entity: sensor.hoymiles_mqtt_bridge_mqtt_errors
+  - entity: binary_sensor.hoymiles_smiles_bridge_application_healthy
+  - entity: sensor.hoymiles_smiles_bridge_uptime
+  - entity: sensor.hoymiles_smiles_bridge_dtu_last_query
+  - entity: sensor.hoymiles_smiles_bridge_mqtt_messages_published
+  - entity: sensor.hoymiles_smiles_bridge_mqtt_errors
 ```
 
 ---
@@ -149,7 +149,7 @@ entities:
 
 **Check:**
 1. Home Assistant logs: Settings → System → Logs
-2. Filter for "hoymiles_mqtt"
+2. Filter for "hoymiles_smiles"
 3. Verify API endpoints are responding
 
 ### Intermittent "unavailable" status (Fixed in v1.1)

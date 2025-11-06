@@ -4,13 +4,13 @@
 
 ### Automated (Recommended)
 ```bash
-cd /Users/tim/Downloads/hoymiles-mqtt-main
+cd /Users/tim/Downloads/hoymiles-smiles-main
 ./install_v1.1.sh
 ```
 
 ### Manual
 ```bash
-cp -r custom_components/hoymiles_mqtt /config/custom_components/
+cp -r custom_components/hoymiles_smiles /config/custom_components/
 ha core restart
 ```
 
@@ -77,7 +77,7 @@ ha core restart
 
 ### If icons don't appear:
 1. Clear browser cache (`Ctrl+Shift+R` or `Cmd+Shift+R`)
-2. Verify files exist: `ls -lh /config/custom_components/hoymiles_mqtt/*.png`
+2. Verify files exist: `ls -lh /config/custom_components/hoymiles_smiles/*.png`
 3. Should show `icon.png` (1.0K) and `logo.png` (3.8K)
 
 ### If still seeing unavailability:
@@ -85,7 +85,7 @@ ha core restart
    ```yaml
    logger:
      logs:
-       custom_components.hoymiles_mqtt.coordinator: debug
+       custom_components.hoymiles_smiles.coordinator: debug
    ```
 2. Restart Home Assistant
 3. Monitor logs for 1 hour
@@ -122,8 +122,8 @@ ha core restart
 
 ```bash
 cd /config/custom_components/
-rm -rf hoymiles_mqtt
-cp -r hoymiles_mqtt.backup.YYYYMMDD_HHMMSS hoymiles_mqtt
+rm -rf hoymiles_smiles
+cp -r hoymiles_smiles.backup.YYYYMMDD_HHMMSS hoymiles_smiles
 ha core restart
 ```
 

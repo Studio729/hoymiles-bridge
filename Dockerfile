@@ -11,7 +11,7 @@ RUN apk add --no-cache \
     musl-dev \
     && rm -rf /var/cache/apk/*
 
-WORKDIR /hoymiles-mqtt
+WORKDIR /hoymiles-smiles
 
 # Copy application files
 COPY . .
@@ -31,4 +31,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
 EXPOSE 8080
 
 # Run application
-CMD [ "python3", "-m" , "hoymiles_mqtt"]
+CMD [ "python3", "-m" , "hoymiles_smiles"]

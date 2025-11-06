@@ -1,4 +1,4 @@
-"""Enhanced Hoymiles to MQTT application with all features."""
+"""Enhanced Hoymiles S-Miles application with all features."""
 
 import argparse
 import logging
@@ -8,18 +8,18 @@ from pathlib import Path
 
 import configargparse
 
-from hoymiles_mqtt import __version__
-from hoymiles_mqtt.circuit_breaker import ErrorRecoveryManager
-from hoymiles_mqtt.config import AppConfig
-from hoymiles_mqtt.health import HealthCheckServer, HealthMetrics
-from hoymiles_mqtt.logging_config import setup_logging
-from hoymiles_mqtt.persistence import PersistenceManager
-from hoymiles_mqtt.runners import (
+from hoymiles_smiles import __version__
+from hoymiles_smiles.circuit_breaker import ErrorRecoveryManager
+from hoymiles_smiles.config import AppConfig
+from hoymiles_smiles.health import HealthCheckServer, HealthMetrics
+from hoymiles_smiles.logging_config import setup_logging
+from hoymiles_smiles.persistence import PersistenceManager
+from hoymiles_smiles.runners import (
     MultiDtuCoordinator,
     run_periodic_coordinator,
     setup_signal_handlers,
 )
-from hoymiles_mqtt.websocket_client import WebSocketClient
+from hoymiles_smiles.websocket_client import WebSocketClient
 
 logger = logging.getLogger(__name__)
 
@@ -27,9 +27,9 @@ logger = logging.getLogger(__name__)
 def parse_args() -> argparse.Namespace:
     """Parse command line arguments."""
     parser = configargparse.ArgParser(
-        description=f'Hoymiles MQTT Bridge v{__version__}',
+        description=f'Hoymiles S-Miles Bridge v{__version__}',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-        prog='python3 -m hoymiles_mqtt',
+        prog='python3 -m hoymiles_smiles',
         config_file_parser_class=configargparse.YAMLConfigFileParser,
     )
     
@@ -47,7 +47,7 @@ def parse_args() -> argparse.Namespace:
     mqtt_group.add('--mqtt-tls-insecure', action='store_true', env_var='MQTT_TLS_INSECURE',
                    help='Allow insecure TLS (skip cert validation)')
     mqtt_group.add('--mqtt-tls-ca-cert', env_var='MQTT_TLS_CA_CERT', help='Path to CA certificate for TLS')
-    mqtt_group.add('--mqtt-client-id', default='hoymiles-mqtt', env_var='MQTT_CLIENT_ID', help='MQTT client ID')
+    mqtt_group.add('--mqtt-client-id', default='hoymiles-smiles', env_var='MQTT_CLIENT_ID', help='MQTT client ID')
     mqtt_group.add('--mqtt-topic-prefix', default='homeassistant', env_var='MQTT_TOPIC_PREFIX',
                    help='MQTT topic prefix')
     
@@ -92,7 +92,7 @@ def parse_args() -> argparse.Namespace:
     persistence_group = parser.add_argument_group('Data Persistence')
     persistence_group.add('--persistence-enabled', action='store_true', default=True,
                           env_var='PERSISTENCE_ENABLED', help='Enable data persistence')
-    persistence_group.add('--database-path', default='/data/hoymiles-mqtt.db',
+    persistence_group.add('--database-path', default='/data/hoymiles-smiles.db',
                           env_var='DATABASE_PATH', help='SQLite database path')
     
     # Health Check

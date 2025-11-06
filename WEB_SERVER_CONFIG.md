@@ -16,7 +16,7 @@ The application includes an optional built-in web server that provides health ch
 
 ```yaml
 services:
-  hoymiles_mqtt:
+  hoymiles_smiles:
     environment:
       HEALTH_ENABLED: true
       HEALTH_PORT: 9090        # Use port 9090 instead of default 8080
@@ -62,7 +62,7 @@ When using `network_mode: host`, the port is directly accessible on the host:
 
 ```yaml
 services:
-  hoymiles_mqtt:
+  hoymiles_smiles:
     network_mode: host
     environment:
       HEALTH_PORT: 8080
@@ -80,7 +80,7 @@ When using bridge networking, you need to expose the port:
 
 ```yaml
 services:
-  hoymiles_mqtt:
+  hoymiles_smiles:
     environment:
       HEALTH_PORT: 8080
     ports:
@@ -139,7 +139,7 @@ curl http://localhost:8080/stats
 **Returns:**
 ```json
 {
-  "database_path": "/data/hoymiles-mqtt.db",
+  "database_path": "/data/hoymiles-smiles.db",
   "database_size_bytes": 12288,
   "production_cache_entries": 4,
   "metrics_entries": 120
@@ -153,9 +153,9 @@ curl http://localhost:8080/stats
 version: "3"
 
 services:
-  hoymiles_mqtt:
-    container_name: "hoymiles_mqtt"
-    image: hoymiles_mqtt
+  hoymiles_smiles:
+    container_name: "hoymiles_smiles"
+    image: hoymiles_smiles
     network_mode: host
     environment:
       MQTT_BROKER: 192.168.1.31
@@ -174,9 +174,9 @@ curl http://192.168.1.31:8080/health
 version: "3"
 
 services:
-  hoymiles_mqtt:
-    container_name: "hoymiles_mqtt"
-    image: hoymiles_mqtt
+  hoymiles_smiles:
+    container_name: "hoymiles_smiles"
+    image: hoymiles_smiles
     network_mode: host
     environment:
       MQTT_BROKER: 192.168.1.31
@@ -195,9 +195,9 @@ curl http://192.168.1.31:9000/health
 version: "3"
 
 services:
-  hoymiles_mqtt:
-    container_name: "hoymiles_mqtt"
-    image: hoymiles_mqtt
+  hoymiles_smiles:
+    container_name: "hoymiles_smiles"
+    image: hoymiles_smiles
     network_mode: host
     environment:
       MQTT_BROKER: 192.168.1.31
@@ -212,18 +212,18 @@ No endpoints available.
 version: "3"
 
 services:
-  hoymiles_mqtt_1:
-    container_name: "hoymiles_mqtt_1"
-    image: hoymiles_mqtt
+  hoymiles_smiles_1:
+    container_name: "hoymiles_smiles_1"
+    image: hoymiles_smiles
     network_mode: host
     environment:
       MQTT_BROKER: 192.168.1.31
       DTU_HOST: 192.168.1.194
       HEALTH_PORT: 8081          # Instance 1 on port 8081
 
-  hoymiles_mqtt_2:
-    container_name: "hoymiles_mqtt_2"
-    image: hoymiles_mqtt
+  hoymiles_smiles_2:
+    container_name: "hoymiles_smiles_2"
+    image: hoymiles_smiles
     network_mode: host
     environment:
       MQTT_BROKER: 192.168.1.31
@@ -313,10 +313,10 @@ readinessProbe:
 apiVersion: v1
 kind: Service
 metadata:
-  name: hoymiles-mqtt
+  name: hoymiles-smiles
 spec:
   selector:
-    app: hoymiles-mqtt
+    app: hoymiles-smiles
   ports:
     - protocol: TCP
       port: 80
@@ -328,7 +328,7 @@ spec:
 ### Prometheus Scrape Config
 ```yaml
 scrape_configs:
-  - job_name: 'hoymiles-mqtt'
+  - job_name: 'hoymiles-smiles'
     static_configs:
       - targets: ['192.168.1.31:8080']
     metrics_path: '/metrics'
@@ -352,7 +352,7 @@ environment:
 ### Expose to Specific Network (Bridge Mode)
 ```yaml
 services:
-  hoymiles_mqtt:
+  hoymiles_smiles:
     networks:
       - internal-network
     ports:
@@ -371,7 +371,7 @@ Put nginx or Caddy in front for:
 ### Web Server Not Starting
 ```bash
 # Check logs
-docker-compose logs hoymiles_mqtt | grep -i health
+docker-compose logs hoymiles_smiles | grep -i health
 
 # Common issues:
 # 1. Port already in use -> Change HEALTH_PORT
@@ -382,13 +382,13 @@ docker-compose logs hoymiles_mqtt | grep -i health
 ### Can't Access from Another Machine
 ```bash
 # 1. Check if service is listening
-docker-compose exec hoymiles_mqtt netstat -tuln | grep 8080
+docker-compose exec hoymiles_smiles netstat -tuln | grep 8080
 
 # 2. Check firewall
 sudo ufw status
 
 # 3. Test locally first
-docker-compose exec hoymiles_mqtt curl http://localhost:8080/health
+docker-compose exec hoymiles_smiles curl http://localhost:8080/health
 
 # 4. Test from host
 curl http://localhost:8080/health
@@ -400,13 +400,13 @@ curl http://192.168.1.31:8080/health
 ### Different Port Not Working
 ```bash
 # Verify environment variable is set
-docker-compose exec hoymiles_mqtt env | grep HEALTH_PORT
+docker-compose exec hoymiles_smiles env | grep HEALTH_PORT
 
 # Restart after changing
-docker-compose restart hoymiles_mqtt
+docker-compose restart hoymiles_smiles
 
 # Check logs for the port being used
-docker-compose logs hoymiles_mqtt | grep "Health check server started"
+docker-compose logs hoymiles_smiles | grep "Health check server started"
 ```
 
 ## Complete Example
@@ -417,9 +417,9 @@ Your original setup enhanced with web server configuration:
 version: "3"
 
 services:
-  hoymiles_mqtt:
-    container_name: "hoymiles_mqtt"
-    image: hoymiles_mqtt
+  hoymiles_smiles:
+    container_name: "hoymiles_smiles"
+    image: hoymiles_smiles
     network_mode: host
     environment:
       # Required

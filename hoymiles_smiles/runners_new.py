@@ -11,12 +11,12 @@ import pytz
 from hoymiles_modbus.client import HoymilesModbusTCP
 from pymodbus import exceptions as pymodbus_exceptions
 
-from hoymiles_mqtt.circuit_breaker import ErrorRecoveryManager
-from hoymiles_mqtt.config import AppConfig, DtuConfig
-from hoymiles_mqtt.ha import HassMqtt
-from hoymiles_mqtt.health import HealthMetrics
-from hoymiles_mqtt.mqtt_client import EnhancedMqttClient
-from hoymiles_mqtt.persistence import PersistenceManager
+from hoymiles_smiles.circuit_breaker import ErrorRecoveryManager
+from hoymiles_smiles.config import AppConfig, DtuConfig
+from hoymiles_smiles.ha import HassMqtt
+from hoymiles_smiles.health import HealthMetrics
+from hoymiles_smiles.mqtt_client import EnhancedMqttClient
+from hoymiles_smiles.persistence import PersistenceManager
 
 logger = logging.getLogger(__name__)
 

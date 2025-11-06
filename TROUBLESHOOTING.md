@@ -6,7 +6,7 @@
 **Check**:
 1. Verify health endpoint is accessible:
    ```bash
-   docker exec hoymiles_mqtt curl -f http://localhost:8090/health
+   docker exec hoymiles_smiles curl -f http://localhost:8090/health
    ```
 2. Check `HEALTH_PORT` matches in:
    - `docker-compose.yml` environment variable
@@ -66,7 +66,7 @@ This prevents cascading failures when DTU is temporarily unresponsive.
    ```yaml
    logger:
      logs:
-       custom_components.hoymiles_mqtt.coordinator: debug
+       custom_components.hoymiles_smiles.coordinator: debug
    ```
 
 2. **Check logs** for:
@@ -88,7 +88,7 @@ This prevents cascading failures when DTU is temporarily unresponsive.
 1. **Clear browser cache**: `Ctrl+Shift+R` (Windows) or `Cmd+Shift+R` (Mac)
 2. **Verify files exist**:
    ```bash
-   ls -lh /config/custom_components/hoymiles_mqtt/*.png
+   ls -lh /config/custom_components/hoymiles_smiles/*.png
    ```
    Should show `icon.png` (1.0K) and `logo.png` (3.8K)
 3. Try another browser to rule out caching
@@ -99,7 +99,7 @@ This prevents cascading failures when DTU is temporarily unresponsive.
 2. Inverters are online (check during daylight)
 3. Bridge container is running: `docker ps`
 4. MQTT broker is accessible
-5. Check bridge logs for errors: `docker logs hoymiles_mqtt`
+5. Check bridge logs for errors: `docker logs hoymiles_smiles`
 
 ---
 
@@ -127,7 +127,7 @@ This prevents cascading failures when DTU is temporarily unresponsive.
 
 4. **Check bridge logs**:
    ```bash
-   docker logs hoymiles_mqtt | grep -i mqtt
+   docker logs hoymiles_smiles | grep -i mqtt
    ```
 
 ### High MQTT Error Count
@@ -177,8 +177,8 @@ curl http://<HOST>:<HEALTH_PORT>/stats
 
 **Solution**: Database auto-manages, but you can reset:
 ```bash
-docker exec hoymiles_mqtt rm /data/hoymiles-mqtt.db
-docker restart hoymiles_mqtt
+docker exec hoymiles_smiles rm /data/hoymiles-smiles.db
+docker restart hoymiles_smiles
 ```
 
 **Note**: This resets `today_production` and `total_production` cache.
@@ -200,20 +200,20 @@ environment:
 ```yaml
 logger:
   logs:
-    custom_components.hoymiles_mqtt: debug
+    custom_components.hoymiles_smiles: debug
 ```
 
 ### View Logs
 **Docker**:
 ```bash
-docker logs hoymiles_mqtt
-docker logs -f hoymiles_mqtt  # Follow mode
-docker logs --tail 100 hoymiles_mqtt  # Last 100 lines
+docker logs hoymiles_smiles
+docker logs -f hoymiles_smiles  # Follow mode
+docker logs --tail 100 hoymiles_smiles  # Last 100 lines
 ```
 
 **Home Assistant**:
 - Settings → System → Logs
-- Filter by `hoymiles_mqtt`
+- Filter by `hoymiles_smiles`
 
 ### Important Log Messages
 
@@ -308,7 +308,7 @@ curl http://<HOST>:<HEALTH_PORT>/ready
 ## Getting Help
 
 ### Gather Information
-1. **Version**: `docker exec hoymiles_mqtt python3 -m hoymiles_mqtt --version`
+1. **Version**: `docker exec hoymiles_smiles python3 -m hoymiles_smiles --version`
 2. **Logs**: Last 100 lines with timestamps
 3. **Configuration**: Your `docker-compose.yml` (redact passwords)
 4. **Health status**: `curl http://<HOST>:<HEALTH_PORT>/health`

@@ -7,10 +7,10 @@ import sys
 import configargparse
 from hoymiles_modbus.client import HoymilesModbusTCP
 
-from hoymiles_mqtt import MI_ENTITIES, PORT_ENTITIES, _main_logger
-from hoymiles_mqtt.ha import HassMqtt
-from hoymiles_mqtt.mqtt import MqttPublisher
-from hoymiles_mqtt.runners import HoymilesQueryJob, run_periodic_job
+from hoymiles_smiles import MI_ENTITIES, PORT_ENTITIES, _main_logger
+from hoymiles_smiles.ha import HassMqtt
+from hoymiles_smiles.mqtt import MqttPublisher
+from hoymiles_smiles.runners import HoymilesQueryJob, run_periodic_job
 
 DEFAULT_MQTT_PORT = 1883
 DEFAULT_MODBUS_PORT = 502
@@ -36,7 +36,7 @@ def _setup_logger(options: configargparse.Namespace) -> None:
 
 def _parse_args() -> argparse.Namespace:
     cfg_parser = configargparse.ArgParser(
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter, prog='python3 -m hoymiles_mqtt'
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter, prog='python3 -m hoymiles_smiles'
     )
     cfg_parser.add('-c', '--config', required=False, type=str, is_config_file=True, help='Config file path')
     cfg_parser.add('--mqtt-broker', required=True, type=str, env_var='MQTT_BROKER', help='Address of MQTT broker')

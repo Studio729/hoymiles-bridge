@@ -23,7 +23,7 @@ services:
       retries: 5
 
   # Hoymiles S-Miles Bridge
-  hoymiles-mqtt:
+  hoymiles-smiles:
     build:
       context: .
       dockerfile: Dockerfile
@@ -96,7 +96,7 @@ services:
     container_name: hoymiles-homeassistant
     restart: unless-stopped
     depends_on:
-      - hoymiles-mqtt
+      - hoymiles-smiles
     environment:
       - TZ=${TIMEZONE:-UTC}
     volumes:

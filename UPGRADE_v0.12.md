@@ -52,7 +52,7 @@ dtu_configs:
 **Configuration:**
 ```bash
 PERSISTENCE_ENABLED=true
-DATABASE_PATH=/data/hoymiles-mqtt.db
+DATABASE_PATH=/data/hoymiles-smiles.db
 ```
 
 ### 4. **Health Monitoring & Metrics**
@@ -164,7 +164,7 @@ curl http://localhost:8080/health
 
 1. **Update dependencies:**
 ```bash
-pip install --upgrade hoymiles-mqtt
+pip install --upgrade hoymiles-smiles
 # or with poetry:
 poetry update
 ```
@@ -175,7 +175,7 @@ poetry update
 
 3. **Run the application:**
 ```bash
-python -m hoymiles_mqtt --config config.yaml
+python -m hoymiles_smiles --config config.yaml
 ```
 
 ## Configuration Reference
@@ -202,7 +202,7 @@ RESET_HOUR=23
 
 # Persistence
 PERSISTENCE_ENABLED=true
-DATABASE_PATH=/data/hoymiles-mqtt.db
+DATABASE_PATH=/data/hoymiles-smiles.db
 
 # Health
 HEALTH_ENABLED=true
@@ -258,7 +258,7 @@ readinessProbe:
 curl http://localhost:8080/health
 
 # Check logs
-docker-compose logs hoymiles-mqtt
+docker-compose logs hoymiles-smiles
 
 # Check metrics
 curl http://localhost:8080/metrics | grep hoymiles
@@ -270,11 +270,11 @@ curl http://localhost:8080/metrics | grep hoymiles
 curl http://localhost:8080/stats
 
 # Backup database manually
-docker-compose exec hoymiles-mqtt sqlite3 /data/hoymiles-mqtt.db ".backup /data/backup.db"
+docker-compose exec hoymiles-smiles sqlite3 /data/hoymiles-smiles.db ".backup /data/backup.db"
 
 # Reset database (WARNING: Loses cached data)
 docker-compose down
-rm ./data/hoymiles-mqtt.db
+rm ./data/hoymiles-smiles.db
 docker-compose up -d
 ```
 
@@ -286,7 +286,7 @@ If the circuit breaker is open (DTU unreachable), it will automatically retry af
 curl http://localhost:8080/health | jq '.dtus'
 
 # Force restart to reset
-docker-compose restart hoymiles-mqtt
+docker-compose restart hoymiles-smiles
 ```
 
 ### Migration from Old Version
@@ -329,7 +329,7 @@ If you need to rollback to v0.11.0:
 
 ```bash
 docker-compose down
-docker-compose pull hoymiles-mqtt:0.11.0
+docker-compose pull hoymiles-smiles:0.11.0
 # Restore old docker-compose.yml and .env
 docker-compose up -d
 ```

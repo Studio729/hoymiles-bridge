@@ -4,7 +4,7 @@ import pytest
 from pathlib import Path
 from pydantic import ValidationError
 
-from hoymiles_mqtt.config import (
+from hoymiles_smiles.config import (
     AppConfig,
     DtuConfig,
     MqttConfig,

@@ -11,9 +11,9 @@ This project provides multiple docker-compose configurations for different use c
 version: "3"
 
 services:
-  hoymiles_mqtt:
-    container_name: "hoymiles_mqtt"
-    image: hoymiles_mqtt
+  hoymiles_smiles:
+    container_name: "hoymiles_smiles"
+    image: hoymiles_smiles
     network_mode: host
     environment:
       MQTT_BROKER: 192.168.1.31
@@ -25,7 +25,7 @@ services:
 **Usage:**
 ```bash
 # Build image
-docker build -t hoymiles_mqtt .
+docker build -t hoymiles_smiles .
 
 # Start service
 docker-compose -f docker-compose.user.yml up -d
@@ -53,12 +53,12 @@ docker-compose -f docker-compose.user.yml down
 version: "3"
 
 services:
-  hoymiles_mqtt:
-    container_name: "hoymiles_mqtt"
+  hoymiles_smiles:
+    container_name: "hoymiles_smiles"
     build:
       context: .
       dockerfile: Dockerfile
-    image: hoymiles_mqtt
+    image: hoymiles_smiles
     network_mode: host
     environment:
       # All environment variables explicitly defined
@@ -136,7 +136,7 @@ LOG_LEVEL=INFO                # DEBUG, INFO, WARNING, ERROR
 ```bash
 # Persistence
 PERSISTENCE_ENABLED=true
-DATABASE_PATH=/data/hoymiles-mqtt.db
+DATABASE_PATH=/data/hoymiles-smiles.db
 
 # Web Server / Health Monitoring
 # Accessible at http://your-ip:PORT (where PORT is HEALTH_PORT value)
@@ -170,9 +170,9 @@ LOG_TO_CONSOLE=true
 ```yaml
 version: "3"
 services:
-  hoymiles_mqtt:
-    container_name: "hoymiles_mqtt"
-    image: hoymiles_mqtt
+  hoymiles_smiles:
+    container_name: "hoymiles_smiles"
+    image: hoymiles_smiles
     network_mode: host
     environment:
       MQTT_BROKER: 192.168.1.31
@@ -189,7 +189,7 @@ services:
 1. **Backup your current setup:**
 ```bash
 docker-compose down
-docker save hoymiles_mqtt > hoymiles_mqtt_backup.tar
+docker save hoymiles_smiles > hoymiles_smiles_backup.tar
 ```
 
 2. **Pull the new code:**
@@ -203,7 +203,7 @@ git pull origin main
 cp docker-compose.user.yml docker-compose.yml
 
 # Or keep your existing file and just rebuild
-docker build -t hoymiles_mqtt .
+docker build -t hoymiles_smiles .
 ```
 
 4. **Start with your existing config (it just works!):**
@@ -271,7 +271,7 @@ networks:
 
 ### Build Image
 ```bash
-docker build -t hoymiles_mqtt .
+docker build -t hoymiles_smiles .
 ```
 
 ### Start Service (Your Format)
@@ -281,12 +281,12 @@ docker-compose -f docker-compose.user.yml up -d
 
 ### View Logs
 ```bash
-docker-compose logs -f hoymiles_mqtt
+docker-compose logs -f hoymiles_smiles
 ```
 
 ### Restart
 ```bash
-docker-compose restart hoymiles_mqtt
+docker-compose restart hoymiles_smiles
 ```
 
 ### Stop
@@ -297,7 +297,7 @@ docker-compose down
 ### Update to Latest
 ```bash
 git pull
-docker build -t hoymiles_mqtt .
+docker build -t hoymiles_smiles .
 docker-compose up -d
 ```
 
@@ -315,7 +315,7 @@ environment:
   LOG_TO_CONSOLE: true
 
 # Then restart
-docker-compose restart hoymiles_mqtt
+docker-compose restart hoymiles_smiles
 ```
 
 ---
@@ -350,7 +350,7 @@ environment:
 volumes:
   - ./data:/data
 environment:
-  DATABASE_PATH: /data/hoymiles-mqtt.db
+  DATABASE_PATH: /data/hoymiles-smiles.db
 ```
 
 ---
@@ -440,7 +440,7 @@ volumes:
 
 ## Need Help?
 
-1. Check logs: `docker-compose logs -f hoymiles_mqtt`
+1. Check logs: `docker-compose logs -f hoymiles_smiles`
 2. Check health: `curl http://localhost:8080/health`
 3. Enable debug: `LOG_LEVEL=DEBUG`
 4. See [UPGRADE_v0.12.md](UPGRADE_v0.12.md) for detailed guide

@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from hoymiles_mqtt.persistence import PersistenceManager
+from hoymiles_smiles.persistence import PersistenceManager
 
 
 @pytest.fixture

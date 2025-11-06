@@ -1,7 +1,7 @@
-site_name: Hoymiles MQTT
-site_url: https://wasilukm.github.io/hoymiles-mqtt
-repo_url: https://github.com/wasilukm/hoymiles-mqtt
-repo_name: wasilukm/hoymiles-mqtt
+site_name: Hoymiles S-Miles
+site_url: https://wasilukm.github.io/hoymiles-smiles
+repo_url: https://github.com/wasilukm/hoymiles-smiles
+repo_name: wasilukm/hoymiles-smiles
 #strict: true
 nav:
   - Home: index.md
@@ -51,7 +51,7 @@ plugins:
       lang: en
   - mkdocstrings:
       watch:
-        - hoymiles-mqtt
+        - hoymiles-smiles
 extra:
   social:
     - icon: fontawesome/brands/twitter
@@ -63,7 +63,7 @@ extra:
       link: https://github.com/waynerv/cookiecutter-pypackage
       name: Facebook
     - icon: fontawesome/brands/github
-      link: https://github.com/wasilukm/hoymiles-mqtt
+      link: https://github.com/wasilukm/hoymiles-smiles
       name: Github
     - icon: material/email
       link: "mailto:foo@bar.com"

@@ -1,1 +1,1 @@
-"""Unit test package for hoymiles-mqtt."""
+"""Unit test package for hoymiles-smiles."""

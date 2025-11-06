@@ -8,9 +8,9 @@ from typing import Callable
 from hoymiles_modbus.client import HoymilesModbusTCP
 from pymodbus import exceptions as pymodbus_exceptions
 
-from hoymiles_mqtt import _main_logger
-from hoymiles_mqtt.ha import HassMqtt
-from hoymiles_mqtt.mqtt import MqttPublisher
+from hoymiles_smiles import _main_logger
+from hoymiles_smiles.ha import HassMqtt
+from hoymiles_smiles.mqtt import MqttPublisher
 
 logger = _main_logger.getChild('runners')
 

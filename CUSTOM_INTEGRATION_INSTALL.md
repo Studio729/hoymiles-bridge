@@ -47,17 +47,17 @@ This is a **native Home Assistant integration** for monitoring your Hoymiles MQT
 
 #### Step 1: Copy Files
 
-Copy the entire `custom_components/hoymiles_mqtt/` directory to your Home Assistant `config` directory:
+Copy the entire `custom_components/hoymiles_smiles/` directory to your Home Assistant `config` directory:
 
 ```bash
 # Option A: Using SSH/SCP
-scp -r custom_components/hoymiles_mqtt/ root@homeassistant:/config/custom_components/
+scp -r custom_components/hoymiles_smiles/ root@homeassistant:/config/custom_components/
 
 # Option B: Using File Editor Add-on
 # Upload folder through Home Assistant File Editor
 
 # Option C: Direct copy (if you have access)
-cp -r custom_components/hoymiles_mqtt/ /config/custom_components/
+cp -r custom_components/hoymiles_smiles/ /config/custom_components/
 ```
 
 Your directory structure should look like:
@@ -65,7 +65,7 @@ Your directory structure should look like:
 /config/
 ├── configuration.yaml
 └── custom_components/
-    └── hoymiles_mqtt/
+    └── hoymiles_smiles/
         ├── __init__.py
         ├── binary_sensor.py
         ├── config_flow.py
@@ -136,20 +136,20 @@ After installation, you'll have these entities:
 
 | Entity ID | Name | Unit | Description |
 |-----------|------|------|-------------|
-| `sensor.hoymiles_mqtt_bridge_uptime` | Uptime | s | Application uptime |
-| `sensor.hoymiles_mqtt_bridge_mqtt_messages_published` | MQTT Messages Published | - | Total messages sent |
-| `sensor.hoymiles_mqtt_bridge_mqtt_errors` | MQTT Errors | - | Total MQTT errors |
-| `sensor.hoymiles_mqtt_bridge_dtu_query_count` | DTU Query Count | queries | Total DTU queries |
-| `sensor.hoymiles_mqtt_bridge_dtu_error_count` | DTU Error Count | errors | Total DTU errors |
-| `sensor.hoymiles_mqtt_bridge_dtu_last_query` | DTU Last Query | s | Time since last query |
-| `sensor.hoymiles_mqtt_bridge_database_size` | Database Size | MB | Database file size |
-| `sensor.hoymiles_mqtt_bridge_cached_records` | Cached Records | records | Cached record count |
+| `sensor.hoymiles_smiles_bridge_uptime` | Uptime | s | Application uptime |
+| `sensor.hoymiles_smiles_bridge_mqtt_messages_published` | MQTT Messages Published | - | Total messages sent |
+| `sensor.hoymiles_smiles_bridge_mqtt_errors` | MQTT Errors | - | Total MQTT errors |
+| `sensor.hoymiles_smiles_bridge_dtu_query_count` | DTU Query Count | queries | Total DTU queries |
+| `sensor.hoymiles_smiles_bridge_dtu_error_count` | DTU Error Count | errors | Total DTU errors |
+| `sensor.hoymiles_smiles_bridge_dtu_last_query` | DTU Last Query | s | Time since last query |
+| `sensor.hoymiles_smiles_bridge_database_size` | Database Size | MB | Database file size |
+| `sensor.hoymiles_smiles_bridge_cached_records` | Cached Records | records | Cached record count |
 
 ### Binary Sensors
 
 | Entity ID | Name | Description |
 |-----------|------|-------------|
-| `binary_sensor.hoymiles_mqtt_bridge_application_healthy` | Application Healthy | Overall health (on/off) |
+| `binary_sensor.hoymiles_smiles_bridge_application_healthy` | Application Healthy | Overall health (on/off) |
 
 ### Device
 
@@ -169,15 +169,15 @@ All entities are grouped under one device:
 type: entities
 title: Hoymiles MQTT Bridge
 entities:
-  - entity: binary_sensor.hoymiles_mqtt_bridge_application_healthy
+  - entity: binary_sensor.hoymiles_smiles_bridge_application_healthy
     name: Status
-  - entity: sensor.hoymiles_mqtt_bridge_uptime
+  - entity: sensor.hoymiles_smiles_bridge_uptime
     name: Uptime
-  - entity: sensor.hoymiles_mqtt_bridge_dtu_last_query
+  - entity: sensor.hoymiles_smiles_bridge_dtu_last_query
     name: Last Query
-  - entity: sensor.hoymiles_mqtt_bridge_mqtt_messages_published
+  - entity: sensor.hoymiles_smiles_bridge_mqtt_messages_published
     name: Messages
-  - entity: sensor.hoymiles_mqtt_bridge_mqtt_errors
+  - entity: sensor.hoymiles_smiles_bridge_mqtt_errors
     name: Errors
 ```
 
@@ -185,7 +185,7 @@ entities:
 
 ```yaml
 type: gauge
-entity: sensor.hoymiles_mqtt_bridge_dtu_last_query
+entity: sensor.hoymiles_smiles_bridge_dtu_last_query
 name: Query Freshness
 unit: seconds
 min: 0
@@ -202,7 +202,7 @@ severity:
 type: statistics-graph
 title: MQTT Messages
 entities:
-  - sensor.hoymiles_mqtt_bridge_mqtt_messages_published
+  - sensor.hoymiles_smiles_bridge_mqtt_messages_published
 stat_types:
   - mean
   - change
@@ -222,7 +222,7 @@ automation:
     mode: single
     trigger:
       - platform: state
-        entity_id: binary_sensor.hoymiles_mqtt_bridge_application_healthy
+        entity_id: binary_sensor.hoymiles_smiles_bridge_application_healthy
         to: "off"
         for:
           minutes: 2
@@ -242,13 +242,13 @@ automation:
     mode: single
     trigger:
       - platform: numeric_state
-        entity_id: sensor.hoymiles_mqtt_bridge_mqtt_errors
+        entity_id: sensor.hoymiles_smiles_bridge_mqtt_errors
         above: 10
     action:
       - action: persistent_notification.create
         data:
           title: "High Error Rate"
-          message: "Hoymiles MQTT has {{ states('sensor.hoymiles_mqtt_bridge_mqtt_errors') }} errors"
+          message: "Hoymiles MQTT has {{ states('sensor.hoymiles_smiles_bridge_mqtt_errors') }} errors"
 ```
 
 ---
@@ -260,7 +260,7 @@ automation:
 **Problem:** Can't find "Hoymiles MQTT Bridge" in integration list
 
 **Solutions:**
-1. Verify files are in `/config/custom_components/hoymiles_mqtt/`
+1. Verify files are in `/config/custom_components/hoymiles_smiles/`
 2. Check Home Assistant logs for errors
 3. Restart Home Assistant again
 4. Clear browser cache
@@ -279,8 +279,8 @@ automation:
 
 2. **Check Hoymiles MQTT is running:**
    ```bash
-   docker ps | grep hoymiles_mqtt
-   docker logs hoymiles_mqtt | grep "Health check server"
+   docker ps | grep hoymiles_smiles
+   docker logs hoymiles_smiles | grep "Health check server"
    ```
 
 3. **Verify health server is enabled:**
@@ -304,7 +304,7 @@ automation:
 
 1. **Check coordinator updates:**
    - Go to **Settings → System → Logs**
-   - Filter for "hoymiles_mqtt"
+   - Filter for "hoymiles_smiles"
    - Look for connection errors
 
 2. **Verify API is responding:**
@@ -345,7 +345,7 @@ automation:
 ### Manual Update
 
 1. Stop Home Assistant (optional)
-2. Replace files in `/config/custom_components/hoymiles_mqtt/`
+2. Replace files in `/config/custom_components/hoymiles_smiles/`
 3. Restart Home Assistant
 4. Check logs for errors
 
@@ -370,7 +370,7 @@ automation:
 ### Step 2: Remove Files
 
 ```bash
-rm -rf /config/custom_components/hoymiles_mqtt/
+rm -rf /config/custom_components/hoymiles_smiles/
 ```
 
 ### Step 3: Restart Home Assistant
@@ -413,7 +413,7 @@ After installation, verify:
 - [ ] Integration appears in **Settings → Devices & Services**
 - [ ] Device "Hoymiles MQTT Bridge" is present
 - [ ] All 9 entities are created (8 sensors + 1 binary sensor)
-- [ ] `binary_sensor.hoymiles_mqtt_bridge_application_healthy` shows correct state
+- [ ] `binary_sensor.hoymiles_smiles_bridge_application_healthy` shows correct state
 - [ ] Sensors are updating (not "unavailable")
 - [ ] No errors in Home Assistant logs
 - [ ] Can add entities to dashboard
@@ -426,7 +426,7 @@ If all checked: **Installation successful! 🎉**
 
 1. **Check logs**: Settings → System → Logs
 2. **Test API**: `curl http://YOUR_IP:8090/health`
-3. **Verify files**: Check all files are in `custom_components/hoymiles_mqtt/`
+3. **Verify files**: Check all files are in `custom_components/hoymiles_smiles/`
 4. **Review config**: Settings → Devices & Services → Hoymiles MQTT Bridge
 
 ---

@@ -1,11 +1,11 @@
 #!/usr/bin/env python
-"""Tests for `hoymiles_mqtt` package."""
+"""Tests for `hoymiles_smiles` package."""
 import json
 
 from hoymiles_modbus.datatypes import InverterData, PlantData
 
-from hoymiles_mqtt import MI_ENTITIES, PORT_ENTITIES
-from hoymiles_mqtt.ha import HassMqtt
+from hoymiles_smiles import MI_ENTITIES, PORT_ENTITIES
+from hoymiles_smiles.ha import HassMqtt
 
 
 def get_example_data() -> PlantData:
@@ -41,14 +41,14 @@ def test_config_payload():
             {
                 'device': {
                     'name': 'DTU_dtu_serial',
-                    'identifiers': ['hoymiles_mqtt_dtu_serial'],
+                    'identifiers': ['hoymiles_smiles_dtu_serial'],
                     'manufacturer': 'Hoymiles',
                 },
                 'name': 'pv_power',
-                'unique_id': 'hoymiles_mqtt_DTU_dtu_serial_pv_power',
-                'state_topic': 'homeassistant/hoymiles_mqtt/dtu_serial/state',
+                'unique_id': 'hoymiles_smiles_DTU_dtu_serial_pv_power',
+                'state_topic': 'homeassistant/hoymiles_smiles/dtu_serial/state',
                 'value_template': "{{ iif(value_json.pv_power is defined, value_json.pv_power, '') }}",
-                'availability_topic': 'homeassistant/hoymiles_mqtt/dtu_serial/state',
+                'availability_topic': 'homeassistant/hoymiles_smiles/dtu_serial/state',
                 'availability_template': "{{ iif(value_json.pv_power is defined, 'online', 'offline') }}",
                 'device_class': 'power',
                 'unit_of_measurement': 'W',
@@ -62,14 +62,14 @@ def test_config_payload():
             {
                 'device': {
                     'name': 'DTU_dtu_serial',
-                    'identifiers': ['hoymiles_mqtt_dtu_serial'],
+                    'identifiers': ['hoymiles_smiles_dtu_serial'],
                     'manufacturer': 'Hoymiles',
                 },
                 'name': 'today_production',
-                'unique_id': 'hoymiles_mqtt_DTU_dtu_serial_today_production',
-                'state_topic': 'homeassistant/hoymiles_mqtt/dtu_serial/state',
+                'unique_id': 'hoymiles_smiles_DTU_dtu_serial_today_production',
+                'state_topic': 'homeassistant/hoymiles_smiles/dtu_serial/state',
                 'value_template': "{{ iif(value_json.today_production is defined, value_json.today_production, '') }}",
-                'availability_topic': 'homeassistant/hoymiles_mqtt/dtu_serial/state',
+                'availability_topic': 'homeassistant/hoymiles_smiles/dtu_serial/state',
                 'availability_template': "{{ iif(value_json.today_production is defined, 'online', 'offline') }}",
                 'device_class': 'energy',
                 'unit_of_measurement': 'Wh',
@@ -83,14 +83,14 @@ def test_config_payload():
             {
                 'device': {
                     'name': 'DTU_dtu_serial',
-                    'identifiers': ['hoymiles_mqtt_dtu_serial'],
+                    'identifiers': ['hoymiles_smiles_dtu_serial'],
                     'manufacturer': 'Hoymiles',
                 },
                 'name': 'total_production',
-                'unique_id': 'hoymiles_mqtt_DTU_dtu_serial_total_production',
-                'state_topic': 'homeassistant/hoymiles_mqtt/dtu_serial/state',
+                'unique_id': 'hoymiles_smiles_DTU_dtu_serial_total_production',
+                'state_topic': 'homeassistant/hoymiles_smiles/dtu_serial/state',
                 'value_template': "{{ iif(value_json.total_production is defined, value_json.total_production, '') }}",
-                'availability_topic': 'homeassistant/hoymiles_mqtt/dtu_serial/state',
+                'availability_topic': 'homeassistant/hoymiles_smiles/dtu_serial/state',
                 'availability_template': "{{ iif(value_json.total_production is defined, 'online', 'offline') }}",
                 'device_class': 'energy',
                 'unit_of_measurement': 'Wh',
@@ -104,14 +104,14 @@ def test_config_payload():
             {
                 'device': {
                     'name': 'DTU_dtu_serial',
-                    'identifiers': ['hoymiles_mqtt_dtu_serial'],
+                    'identifiers': ['hoymiles_smiles_dtu_serial'],
                     'manufacturer': 'Hoymiles',
                 },
                 'name': 'alarm_flag',
-                'unique_id': 'hoymiles_mqtt_DTU_dtu_serial_alarm_flag',
-                'state_topic': 'homeassistant/hoymiles_mqtt/dtu_serial/state',
+                'unique_id': 'hoymiles_smiles_DTU_dtu_serial_alarm_flag',
+                'state_topic': 'homeassistant/hoymiles_smiles/dtu_serial/state',
                 'value_template': "{{ iif(value_json.alarm_flag is defined, value_json.alarm_flag, '') }}",
-                'availability_topic': 'homeassistant/hoymiles_mqtt/dtu_serial/state',
+                'availability_topic': 'homeassistant/hoymiles_smiles/dtu_serial/state',
                 'availability_template': "{{ iif(value_json.alarm_flag is defined, 'online', 'offline') }}",
                 'device_class': 'problem',
             }
@@ -123,14 +123,14 @@ def test_config_payload():
             {
                 'device': {
                     'name': 'inv_102162804827',
-                    'identifiers': ['hoymiles_mqtt_102162804827'],
+                    'identifiers': ['hoymiles_smiles_102162804827'],
                     'manufacturer': 'Hoymiles',
                 },
                 'name': 'grid_voltage',
-                'unique_id': 'hoymiles_mqtt_inv_102162804827_grid_voltage',
-                'state_topic': 'homeassistant/hoymiles_mqtt/102162804827/state',
+                'unique_id': 'hoymiles_smiles_inv_102162804827_grid_voltage',
+                'state_topic': 'homeassistant/hoymiles_smiles/102162804827/state',
                 'value_template': "{{ iif(value_json.grid_voltage is defined, value_json.grid_voltage, '') }}",
-                'availability_topic': 'homeassistant/hoymiles_mqtt/102162804827/state',
+                'availability_topic': 'homeassistant/hoymiles_smiles/102162804827/state',
                 'availability_template': "{{ iif(value_json.grid_voltage is defined, 'online', 'offline') }}",
                 'device_class': 'voltage',
                 'unit_of_measurement': 'V',
@@ -144,14 +144,14 @@ def test_config_payload():
             {
                 'device': {
                     'name': 'inv_102162804827',
-                    'identifiers': ['hoymiles_mqtt_102162804827'],
+                    'identifiers': ['hoymiles_smiles_102162804827'],
                     'manufacturer': 'Hoymiles',
                 },
                 'name': 'port_3_pv_voltage',
-                'unique_id': 'hoymiles_mqtt_port_3_102162804827_pv_voltage',
-                'state_topic': 'homeassistant/hoymiles_mqtt/102162804827/3/state',
+                'unique_id': 'hoymiles_smiles_port_3_102162804827_pv_voltage',
+                'state_topic': 'homeassistant/hoymiles_smiles/102162804827/3/state',
                 'value_template': "{{ iif(value_json.pv_voltage is defined, value_json.pv_voltage, '') }}",
-                'availability_topic': 'homeassistant/hoymiles_mqtt/102162804827/3/state',
+                'availability_topic': 'homeassistant/hoymiles_smiles/102162804827/3/state',
                 'availability_template': "{{ iif(value_json.pv_voltage is defined, 'online', 'offline') }}",
                 'device_class': 'voltage',
                 'unit_of_measurement': 'V',
@@ -167,16 +167,16 @@ def test_get_states():
     example_data = get_example_data()
     states = list(ha.get_states(example_data))
     assert states[0] == (
-        'homeassistant/hoymiles_mqtt/dtu_serial/state',
+        'homeassistant/hoymiles_smiles/dtu_serial/state',
         '{"pv_power": 0.0, "today_production": 431, "total_production": 8844, "alarm_flag": "OFF"}',
     )
     assert states[1] == (
-        'homeassistant/hoymiles_mqtt/102162804827/state',
+        'homeassistant/hoymiles_smiles/102162804827/state',
         '{"grid_voltage": 22.33, "grid_frequency": 32.12, "temperature": 20.4, "operating_status": 3, '
         '"alarm_code": 0, "alarm_count": 2, "link_status": 1}',
     )
     assert states[2] == (
-        'homeassistant/hoymiles_mqtt/102162804827/3/state',
+        'homeassistant/hoymiles_smiles/102162804827/3/state',
         '{"pv_voltage": 1.234, "pv_current": 2.34, "pv_power": 40.31, "today_production": 431, '
         '"total_production": 8844}',
     )
@@ -184,11 +184,11 @@ def test_get_states():
     example_data.inverters[0].total_production += 2
     states = list(ha.get_states(example_data))
     assert states[0] == (
-        'homeassistant/hoymiles_mqtt/dtu_serial/state',
+        'homeassistant/hoymiles_smiles/dtu_serial/state',
         '{"pv_power": 0.0, "today_production": 432, "total_production": 8846, "alarm_flag": "OFF"}',
     )
     assert states[2] == (
-        'homeassistant/hoymiles_mqtt/102162804827/3/state',
+        'homeassistant/hoymiles_smiles/102162804827/3/state',
         '{"pv_voltage": 1.234, "pv_current": 2.34, "pv_power": 40.31, "today_production": 432, '
         '"total_production": 8846}',
     )
@@ -205,7 +205,7 @@ def test_zero_operating_status():
     example_data.inverters[0].total_production += 2
     states = list(ha.get_states(example_data))
     assert states[0] == (
-        'homeassistant/hoymiles_mqtt/dtu_serial/state',
+        'homeassistant/hoymiles_smiles/dtu_serial/state',
         '{"pv_power": 0.0, "today_production": 431, "total_production": 8844, "alarm_flag": "OFF"}',
     )
 
@@ -219,11 +219,11 @@ def test_production_drop():
     example_data.inverters[0].total_production -= 2
     states = list(ha.get_states(example_data))
     assert states[0] == (
-        'homeassistant/hoymiles_mqtt/dtu_serial/state',
+        'homeassistant/hoymiles_smiles/dtu_serial/state',
         '{"pv_power": 0.0, "today_production": 431, "total_production": 8844, "alarm_flag": "OFF"}',
     )
     assert states[2] == (
-        'homeassistant/hoymiles_mqtt/102162804827/3/state',
+        'homeassistant/hoymiles_smiles/102162804827/3/state',
         '{"pv_voltage": 1.234, "pv_current": 2.34, "pv_power": 40.31, "today_production": 431, '
         '"total_production": 8844}',
     )

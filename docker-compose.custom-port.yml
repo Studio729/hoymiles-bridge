@@ -4,12 +4,12 @@
 version: "3"
 
 services:
-  hoymiles_mqtt:
-    container_name: "hoymiles_mqtt"
+  hoymiles_smiles:
+    container_name: "hoymiles_smiles"
     build:
       context: .
       dockerfile: Dockerfile
-    image: hoymiles_mqtt
+    image: hoymiles_smiles
     network_mode: host
     environment:
       # Required Settings

@@ -120,8 +120,8 @@ Check immediately after adding integration:
 ## Installation
 
 ```bash
-cd /Users/tim/Downloads/hoymiles-mqtt-main
-cp -r custom_components/hoymiles_mqtt /config/custom_components/
+cd /Users/tim/Downloads/hoymiles-smiles-main
+cp -r custom_components/hoymiles_smiles /config/custom_components/
 # Restart Home Assistant
 ```
 
@@ -151,7 +151,7 @@ cp -r custom_components/hoymiles_mqtt /config/custom_components/
    - **Timeline should show**: No "unavailable" period at the start
 
 5. **Check logs**: Settings → System → Logs
-   - Filter by "hoymiles_mqtt"
+   - Filter by "hoymiles_smiles"
    - **Look for**: 
      ```
      [Initial State] Writing initial state for Hoymiles MQTT Bridge sensor: on (available=True)
@@ -205,7 +205,7 @@ You might wonder: "Why write the state twice?"
 ## Known Limitations
 
 **Entity ID**: Even though the binary sensor appears first, its entity ID will still be:
-- `binary_sensor.hoymiles_mqtt_bridge_hoymiles_mqtt_bridge`
+- `binary_sensor.hoymiles_smiles_bridge_hoymiles_smiles_bridge`
 
 This is because entity IDs are determined by the unique_id, not display order.
 

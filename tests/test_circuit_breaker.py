@@ -3,7 +3,7 @@
 import time
 import pytest
 
-from hoymiles_mqtt.circuit_breaker import CircuitBreaker, CircuitBreakerState
+from hoymiles_smiles.circuit_breaker import CircuitBreaker, CircuitBreakerState
 
 
 def test_circuit_breaker_initialization():

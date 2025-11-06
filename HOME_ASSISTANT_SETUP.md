@@ -51,7 +51,7 @@ homeassistant:
 #### Step 2: Create Package File
 
 1. Create directory: `config/packages/`
-2. Copy `home_assistant_sensors.yaml` to `config/packages/hoymiles_mqtt.yaml`
+2. Copy `home_assistant_sensors.yaml` to `config/packages/hoymiles_smiles.yaml`
 3. Edit the file and update the IP address if needed:
    ```yaml
    resource: http://192.168.1.31:8090/health  # ← Update this
@@ -102,7 +102,7 @@ If you have the File Editor add-on:
 
 1. **Settings** → **Add-ons** → **File editor**
 2. Navigate to `config/` directory
-3. Create new file: `packages/hoymiles_mqtt.yaml`
+3. Create new file: `packages/hoymiles_smiles.yaml`
 4. Paste contents from `home_assistant_sensors.yaml`
 5. Update IP address
 6. Save and restart Home Assistant
@@ -117,17 +117,17 @@ After installation, you'll have these sensors:
 
 | Entity ID | Description | Updates |
 |-----------|-------------|---------|
-| `sensor.hoymiles_mqtt_health_status` | Overall health (True/False) | 60s |
-| `binary_sensor.hoymiles_mqtt_healthy` | Binary health status | Real-time |
-| `sensor.hoymiles_mqtt_uptime` | Uptime in seconds | 60s |
-| `sensor.hoymiles_mqtt_uptime_formatted` | Human-readable uptime | 60s |
+| `sensor.hoymiles_smiles_health_status` | Overall health (True/False) | 60s |
+| `binary_sensor.hoymiles_smiles_healthy` | Binary health status | Real-time |
+| `sensor.hoymiles_smiles_uptime` | Uptime in seconds | 60s |
+| `sensor.hoymiles_smiles_uptime_formatted` | Human-readable uptime | 60s |
 
 ### MQTT Monitoring
 
 | Entity ID | Description | Updates |
 |-----------|-------------|---------|
-| `sensor.hoymiles_mqtt_messages_published` | Total MQTT messages sent | 60s |
-| `sensor.hoymiles_mqtt_errors` | Total MQTT errors | 60s |
+| `sensor.hoymiles_smiles_messages_published` | Total MQTT messages sent | 60s |
+| `sensor.hoymiles_smiles_errors` | Total MQTT errors | 60s |
 
 ### DTU Monitoring
 
@@ -142,8 +142,8 @@ After installation, you'll have these sensors:
 
 | Entity ID | Description | Updates |
 |-----------|-------------|---------|
-| `sensor.hoymiles_mqtt_database_size` | Database size in MB | 5min |
-| `sensor.hoymiles_mqtt_cached_records` | Number of cached records | 5min |
+| `sensor.hoymiles_smiles_database_size` | Database size in MB | 5min |
+| `sensor.hoymiles_smiles_cached_records` | Number of cached records | 5min |
 
 ---
 
@@ -157,18 +157,18 @@ Add this to your dashboard:
 type: entities
 title: Hoymiles MQTT Health
 entities:
-  - entity: binary_sensor.hoymiles_mqtt_healthy
+  - entity: binary_sensor.hoymiles_smiles_healthy
     name: Status
-  - entity: sensor.hoymiles_mqtt_uptime_formatted
+  - entity: sensor.hoymiles_smiles_uptime_formatted
     name: Uptime
   - entity: sensor.hoymiles_dtu_status
     name: DTU Status
   - entity: sensor.hoymiles_dtu_last_query
     name: Last Query
     secondary_info: relative-time
-  - entity: sensor.hoymiles_mqtt_messages_published
+  - entity: sensor.hoymiles_smiles_messages_published
     name: Messages Published
-  - entity: sensor.hoymiles_mqtt_errors
+  - entity: sensor.hoymiles_smiles_errors
     name: Errors
 ```
 
@@ -180,9 +180,9 @@ cards:
   - type: entities
     title: 🏥 Health Status
     entities:
-      - entity: binary_sensor.hoymiles_mqtt_healthy
+      - entity: binary_sensor.hoymiles_smiles_healthy
         name: Application Health
-      - entity: sensor.hoymiles_mqtt_uptime_formatted
+      - entity: sensor.hoymiles_smiles_uptime_formatted
         name: Uptime
       - type: divider
       - entity: sensor.hoymiles_dtu_status
@@ -198,19 +198,19 @@ cards:
   - type: entities
     title: 📊 MQTT Statistics
     entities:
-      - entity: sensor.hoymiles_mqtt_messages_published
+      - entity: sensor.hoymiles_smiles_messages_published
         name: Messages Published
         icon: mdi:message-arrow-right
-      - entity: sensor.hoymiles_mqtt_errors
+      - entity: sensor.hoymiles_smiles_errors
         name: MQTT Errors
         icon: mdi:alert-circle
 
   - type: entities
     title: 💾 Database
     entities:
-      - entity: sensor.hoymiles_mqtt_database_size
+      - entity: sensor.hoymiles_smiles_database_size
         name: Database Size
-      - entity: sensor.hoymiles_mqtt_cached_records
+      - entity: sensor.hoymiles_smiles_cached_records
         name: Cached Records
 ```
 
@@ -225,7 +225,7 @@ hours_to_show: 24
 entities:
   - entity: sensor.hoymiles_dtu_last_query
     name: Query Age
-  - entity: sensor.hoymiles_mqtt_messages_published
+  - entity: sensor.hoymiles_smiles_messages_published
     name: Messages
   - entity: sensor.hoymiles_dtu_error_count
     name: Errors
@@ -235,7 +235,7 @@ entities:
 
 ```yaml
 type: statistic
-entity: sensor.hoymiles_mqtt_uptime
+entity: sensor.hoymiles_smiles_uptime
 name: Application Uptime
 stat_type: mean
 period:
@@ -314,7 +314,7 @@ template:
       - name: "Hoymiles DTU Last Error"
         unique_id: hoymiles_dtu_last_error
         state: >-
-          {% set dtus = state_attr('sensor.hoymiles_mqtt_health_status', 'dtus') %}
+          {% set dtus = state_attr('sensor.hoymiles_smiles_health_status', 'dtus') %}
           {% if dtus and dtus.DTU and dtus.DTU.last_error %}
             {{ dtus.DTU.last_error }}
           {% else %}
@@ -333,7 +333,7 @@ template:
       - name: "Hoymiles DTU2 Status"
         unique_id: hoymiles_dtu2_status
         state: >-
-          {% set dtus = state_attr('sensor.hoymiles_mqtt_health_status', 'dtus') %}
+          {% set dtus = state_attr('sensor.hoymiles_smiles_health_status', 'dtus') %}
           {% if dtus and dtus.DTU2 %}
             {{ dtus.DTU2.status | default('unknown') }}
           {% else %}
@@ -372,12 +372,12 @@ template:
 
 1. **Verify Hoymiles MQTT is running:**
    ```bash
-   docker ps | grep hoymiles_mqtt
+   docker ps | grep hoymiles_smiles
    ```
 
 2. **Check health server is listening:**
    ```bash
-   docker exec hoymiles_mqtt netstat -tuln | grep 8090
+   docker exec hoymiles_smiles netstat -tuln | grep 8090
    ```
 
 3. **Test from HA host:**
@@ -387,9 +387,9 @@ template:
 
 ### Binary Sensor Always "Off"
 
-**Problem:** `binary_sensor.hoymiles_mqtt_healthy` shows unavailable
+**Problem:** `binary_sensor.hoymiles_smiles_healthy` shows unavailable
 
-**Solution:** This depends on `sensor.hoymiles_mqtt_health_status`. Check that sensor first.
+**Solution:** This depends on `sensor.hoymiles_smiles_health_status`. Check that sensor first.
 
 ### Template Errors
 
@@ -400,7 +400,7 @@ template:
 1. **Developer Tools** → **Template**
 2. Paste template and test:
    ```jinja
-   {% set dtus = state_attr('sensor.hoymiles_mqtt_health_status', 'dtus') %}
+   {% set dtus = state_attr('sensor.hoymiles_smiles_health_status', 'dtus') %}
    {{ dtus }}
    ```
 3. Check if attribute exists
@@ -460,11 +460,11 @@ After setup, your dashboard could look like this:
 
 After installation, verify:
 
-- [ ] `sensor.hoymiles_mqtt_health_status` shows "True"
-- [ ] `sensor.hoymiles_mqtt_uptime` is counting up
-- [ ] `binary_sensor.hoymiles_mqtt_healthy` shows "on"
+- [ ] `sensor.hoymiles_smiles_health_status` shows "True"
+- [ ] `sensor.hoymiles_smiles_uptime` is counting up
+- [ ] `binary_sensor.hoymiles_smiles_healthy` shows "on"
 - [ ] `sensor.hoymiles_dtu_status` shows "connected"
-- [ ] `sensor.hoymiles_mqtt_messages_published` is increasing
+- [ ] `sensor.hoymiles_smiles_messages_published` is increasing
 - [ ] No errors in Home Assistant logs
 - [ ] Dashboard card displays correctly
 

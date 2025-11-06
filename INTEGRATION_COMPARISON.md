@@ -54,7 +54,7 @@ This guide helps you choose the best option for your needs.
 ✅ You want the **"official integration" feel**
 ✅ You plan to **share this with others** who aren't technical
 
-**→ Use:** `custom_components/hoymiles_mqtt/`
+**→ Use:** `custom_components/hoymiles_smiles/`
 
 ---
 
@@ -69,10 +69,10 @@ homeassistant:
   packages: !include_dir_named packages
 
 # 2. Copy sensor file
-cp home_assistant_sensors.yaml /config/packages/hoymiles_mqtt.yaml
+cp home_assistant_sensors.yaml /config/packages/hoymiles_smiles.yaml
 
 # 3. Edit IP address in file
-nano /config/packages/hoymiles_mqtt.yaml
+nano /config/packages/hoymiles_smiles.yaml
 
 # 4. Restart Home Assistant
 ```
@@ -83,7 +83,7 @@ nano /config/packages/hoymiles_mqtt.yaml
 #### Custom Integration
 ```bash
 # 1. Copy integration folder
-cp -r custom_components/hoymiles_mqtt/ /config/custom_components/
+cp -r custom_components/hoymiles_smiles/ /config/custom_components/
 
 # 2. Restart Home Assistant
 
@@ -105,7 +105,7 @@ Settings → Devices & Services → Add Integration → Hoymiles MQTT Bridge
 **Changing IP Address:**
 ```yaml
 # Edit file
-nano /config/packages/hoymiles_mqtt.yaml
+nano /config/packages/hoymiles_smiles.yaml
 
 # Change line 7
 resource: "http://192.168.1.50:8090/health"  # New IP
@@ -144,9 +144,9 @@ scan_interval: 30  # Change from 60 to 30
 ```
 Developer Tools → States
 
-sensor.hoymiles_mqtt_health_status
-sensor.hoymiles_mqtt_uptime
-sensor.hoymiles_mqtt_uptime_formatted
+sensor.hoymiles_smiles_health_status
+sensor.hoymiles_smiles_uptime
+sensor.hoymiles_smiles_uptime_formatted
 sensor.hoymiles_dtu_status
 ...
 (11 separate entities, not grouped)
@@ -161,15 +161,15 @@ sensor.hoymiles_dtu_status
 Settings → Devices & Services → Hoymiles MQTT Bridge
 
 Device: Hoymiles MQTT Bridge
-├── binary_sensor.hoymiles_mqtt_bridge_application_healthy
-├── sensor.hoymiles_mqtt_bridge_uptime
-├── sensor.hoymiles_mqtt_bridge_mqtt_messages_published
-├── sensor.hoymiles_mqtt_bridge_mqtt_errors
-├── sensor.hoymiles_mqtt_bridge_dtu_query_count
-├── sensor.hoymiles_mqtt_bridge_dtu_error_count
-├── sensor.hoymiles_mqtt_bridge_dtu_last_query
-├── sensor.hoymiles_mqtt_bridge_database_size
-└── sensor.hoymiles_mqtt_bridge_cached_records
+├── binary_sensor.hoymiles_smiles_bridge_application_healthy
+├── sensor.hoymiles_smiles_bridge_uptime
+├── sensor.hoymiles_smiles_bridge_mqtt_messages_published
+├── sensor.hoymiles_smiles_bridge_mqtt_errors
+├── sensor.hoymiles_smiles_bridge_dtu_query_count
+├── sensor.hoymiles_smiles_bridge_dtu_error_count
+├── sensor.hoymiles_smiles_bridge_dtu_last_query
+├── sensor.hoymiles_smiles_bridge_database_size
+└── sensor.hoymiles_smiles_bridge_cached_records
 ```
 
 **Entity IDs:** Automatically generated, consistent
@@ -181,35 +181,35 @@ Device: Hoymiles MQTT Bridge
 #### YAML Configuration (11 entities)
 
 **Sensors:**
-1. `sensor.hoymiles_mqtt_health_status` - Raw health (True/False)
-2. `sensor.hoymiles_mqtt_uptime` - Uptime (seconds)
-3. `sensor.hoymiles_mqtt_uptime_formatted` - Uptime (human readable)
+1. `sensor.hoymiles_smiles_health_status` - Raw health (True/False)
+2. `sensor.hoymiles_smiles_uptime` - Uptime (seconds)
+3. `sensor.hoymiles_smiles_uptime_formatted` - Uptime (human readable)
 4. `sensor.hoymiles_dtu_status` - DTU status text
 5. `sensor.hoymiles_dtu_last_query` - Seconds since last query
 6. `sensor.hoymiles_dtu_query_count` - Total queries
 7. `sensor.hoymiles_dtu_error_count` - Total errors
-8. `sensor.hoymiles_mqtt_messages_published` - MQTT messages
-9. `sensor.hoymiles_mqtt_errors` - MQTT errors
-10. `sensor.hoymiles_mqtt_database_size` - Database size
-11. `sensor.hoymiles_mqtt_cached_records` - Cached records
+8. `sensor.hoymiles_smiles_messages_published` - MQTT messages
+9. `sensor.hoymiles_smiles_errors` - MQTT errors
+10. `sensor.hoymiles_smiles_database_size` - Database size
+11. `sensor.hoymiles_smiles_cached_records` - Cached records
 
 **Binary Sensors:**
-- `binary_sensor.hoymiles_mqtt_healthy` - On/Off status
+- `binary_sensor.hoymiles_smiles_healthy` - On/Off status
 
 #### Custom Integration (9 entities)
 
 **Sensors:**
-1. `sensor.hoymiles_mqtt_bridge_uptime` - Uptime with start_time attribute
-2. `sensor.hoymiles_mqtt_bridge_mqtt_messages_published` - MQTT messages
-3. `sensor.hoymiles_mqtt_bridge_mqtt_errors` - MQTT errors
-4. `sensor.hoymiles_mqtt_bridge_dtu_query_count` - Queries with status attribute
-5. `sensor.hoymiles_mqtt_bridge_dtu_error_count` - Errors with last error attribute
-6. `sensor.hoymiles_mqtt_bridge_dtu_last_query` - Time with timestamp attribute
-7. `sensor.hoymiles_mqtt_bridge_database_size` - Database size (diagnostic)
-8. `sensor.hoymiles_mqtt_bridge_cached_records` - Records (diagnostic)
+1. `sensor.hoymiles_smiles_bridge_uptime` - Uptime with start_time attribute
+2. `sensor.hoymiles_smiles_bridge_mqtt_messages_published` - MQTT messages
+3. `sensor.hoymiles_smiles_bridge_mqtt_errors` - MQTT errors
+4. `sensor.hoymiles_smiles_bridge_dtu_query_count` - Queries with status attribute
+5. `sensor.hoymiles_smiles_bridge_dtu_error_count` - Errors with last error attribute
+6. `sensor.hoymiles_smiles_bridge_dtu_last_query` - Time with timestamp attribute
+7. `sensor.hoymiles_smiles_bridge_database_size` - Database size (diagnostic)
+8. `sensor.hoymiles_smiles_bridge_cached_records` - Records (diagnostic)
 
 **Binary Sensors:**
-- `binary_sensor.hoymiles_mqtt_bridge_application_healthy` - Health with rich attributes
+- `binary_sensor.hoymiles_smiles_bridge_application_healthy` - Health with rich attributes
 
 **Note:** Custom integration uses attributes more, resulting in fewer but richer entities.
 
@@ -303,7 +303,7 @@ except aiohttp.ClientError as err:
 #### Custom Integration
 
 **Updating:**
-1. Replace files in `custom_components/hoymiles_mqtt/`
+1. Replace files in `custom_components/hoymiles_smiles/`
 2. Restart Home Assistant
 3. Settings preserved automatically
 
@@ -333,7 +333,7 @@ template:
   - sensor:
       - name: "My Custom Calculation"
         state: >
-          {{ states('sensor.hoymiles_mqtt_uptime') | int / 3600 | round(2) }}
+          {{ states('sensor.hoymiles_smiles_uptime') | int / 3600 | round(2) }}
         unit_of_measurement: "hours"
 ```
 
@@ -373,7 +373,7 @@ HoymilesMqttSensorEntityDescription(
 #### Custom Integration
 
 **Sharing:**
-1. Share `custom_components/hoymiles_mqtt/` folder
+1. Share `custom_components/hoymiles_smiles/` folder
 2. User copies to their config
 3. User restarts HA
 4. User adds via UI (enters IP)
@@ -472,15 +472,15 @@ If you switch between approaches:
 
 | YAML Entity | Custom Integration Entity |
 |-------------|--------------------------|
-| `sensor.hoymiles_mqtt_health_status` | `binary_sensor.hoymiles_mqtt_bridge_application_healthy` |
-| `sensor.hoymiles_mqtt_uptime` | `sensor.hoymiles_mqtt_bridge_uptime` |
-| `sensor.hoymiles_mqtt_messages_published` | `sensor.hoymiles_mqtt_bridge_mqtt_messages_published` |
-| `sensor.hoymiles_mqtt_errors` | `sensor.hoymiles_mqtt_bridge_mqtt_errors` |
-| `sensor.hoymiles_dtu_query_count` | `sensor.hoymiles_mqtt_bridge_dtu_query_count` |
-| `sensor.hoymiles_dtu_error_count` | `sensor.hoymiles_mqtt_bridge_dtu_error_count` |
-| `sensor.hoymiles_dtu_last_query` | `sensor.hoymiles_mqtt_bridge_dtu_last_query` |
-| `sensor.hoymiles_mqtt_database_size` | `sensor.hoymiles_mqtt_bridge_database_size` |
-| `sensor.hoymiles_mqtt_cached_records` | `sensor.hoymiles_mqtt_bridge_cached_records` |
+| `sensor.hoymiles_smiles_health_status` | `binary_sensor.hoymiles_smiles_bridge_application_healthy` |
+| `sensor.hoymiles_smiles_uptime` | `sensor.hoymiles_smiles_bridge_uptime` |
+| `sensor.hoymiles_smiles_messages_published` | `sensor.hoymiles_smiles_bridge_mqtt_messages_published` |
+| `sensor.hoymiles_smiles_errors` | `sensor.hoymiles_smiles_bridge_mqtt_errors` |
+| `sensor.hoymiles_dtu_query_count` | `sensor.hoymiles_smiles_bridge_dtu_query_count` |
+| `sensor.hoymiles_dtu_error_count` | `sensor.hoymiles_smiles_bridge_dtu_error_count` |
+| `sensor.hoymiles_dtu_last_query` | `sensor.hoymiles_smiles_bridge_dtu_last_query` |
+| `sensor.hoymiles_smiles_database_size` | `sensor.hoymiles_smiles_bridge_database_size` |
+| `sensor.hoymiles_smiles_cached_records` | `sensor.hoymiles_smiles_bridge_cached_records` |
 
 **Note:** Entity IDs are different! Update your dashboards and automations.
 
@@ -516,7 +516,7 @@ If you switch between approaches:
 ### Custom Integration
 - **Installation**: `CUSTOM_INTEGRATION_INSTALL.md`
 - **Developer Guide**: `CUSTOM_INTEGRATION_GUIDE.md`
-- **Files**: `custom_components/hoymiles_mqtt/`
+- **Files**: `custom_components/hoymiles_smiles/`
 
 ---
 

@@ -16,7 +16,7 @@
 - **After**: Clear message "Health endpoint unavailable (503). Bridge may be starting up."
 
 ### 2. Deprecation Warning (Home Assistant 2025.12)
-**Problem**: Warning logged: "Detected that custom integration 'hoymiles_mqtt' sets option flow config_entry explicitly, which is deprecated"
+**Problem**: Warning logged: "Detected that custom integration 'hoymiles_smiles' sets option flow config_entry explicitly, which is deprecated"
 
 **Solution**: 
 - Removed the explicit `__init__` method from `HoymilesMqttOptionsFlow`
@@ -80,8 +80,8 @@ else:
 ## Installation
 
 ```bash
-cd /Users/tim/Downloads/hoymiles-mqtt-main
-cp -r custom_components/hoymiles_mqtt /config/custom_components/
+cd /Users/tim/Downloads/hoymiles-smiles-main
+cp -r custom_components/hoymiles_smiles /config/custom_components/
 # Restart Home Assistant
 ```
 
@@ -93,7 +93,7 @@ cp -r custom_components/hoymiles_mqtt /config/custom_components/
 
 **Scenario**: Try to add integration while bridge is starting up
 
-1. **Restart bridge container**: `docker restart hoymiles_mqtt`
+1. **Restart bridge container**: `docker restart hoymiles_smiles`
 2. **Immediately try to add integration** (while bridge is starting)
 3. **Expected**: Clear error message about bridge starting up
 4. **Wait 30 seconds** and try again

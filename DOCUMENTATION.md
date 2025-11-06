@@ -23,7 +23,7 @@
 
 | Document | Description |
 |----------|-------------|
-| **[custom_components/hoymiles_mqtt/README.md](custom_components/hoymiles_mqtt/README.md)** | Custom integration overview |
+| **[custom_components/hoymiles_smiles/README.md](custom_components/hoymiles_smiles/README.md)** | Custom integration overview |
 | **[CUSTOM_INTEGRATION_INSTALL.md](CUSTOM_INTEGRATION_INSTALL.md)** | Detailed installation guide |
 | **[CUSTOM_INTEGRATION_GUIDE.md](CUSTOM_INTEGRATION_GUIDE.md)** | Developer guide and architecture |
 | **[HOME_ASSISTANT_SETUP.md](HOME_ASSISTANT_SETUP.md)** | YAML configuration setup |
@@ -61,7 +61,7 @@
 → [QUICK_START.md](QUICK_START.md)
 
 **Add Home Assistant integration**
-→ [custom_components/hoymiles_mqtt/README.md](custom_components/hoymiles_mqtt/README.md)  
+→ [custom_components/hoymiles_smiles/README.md](custom_components/hoymiles_smiles/README.md)  
 → Run: `./install_v1.1.sh`
 
 **Upgrade to v1.1**
@@ -104,14 +104,14 @@
 
 # Docker
 docker-compose up -d
-docker logs hoymiles_mqtt
-docker restart hoymiles_mqtt
+docker logs hoymiles_smiles
+docker restart hoymiles_smiles
 
 # Health check
 curl http://localhost:8090/health | jq
 
 # Troubleshoot
-docker logs -f hoymiles_mqtt
+docker logs -f hoymiles_smiles
 ```
 
 ---
@@ -119,7 +119,7 @@ docker logs -f hoymiles_mqtt
 ## File Structure
 
 ```
-hoymiles-mqtt-main/
+hoymiles-smiles-main/
 ├── README.md                          # Start here
 ├── DOCUMENTATION.md                   # This file
 ├── QUICK_START.md                     # 5-min setup
@@ -127,12 +127,12 @@ hoymiles-mqtt-main/
 ├── TROUBLESHOOTING.md                 # Problem solving
 │
 ├── custom_components/                 # Home Assistant integration
-│   └── hoymiles_mqtt/
+│   └── hoymiles_smiles/
 │       ├── README.md                  # Integration docs
 │       ├── icon.png, logo.png         # Custom branding
 │       └── *.py                       # Integration code
 │
-├── hoymiles_mqtt/                     # Application code
+├── hoymiles_smiles/                     # Application code
 ├── tests/                             # Test suite
 ├── docs/                              # MkDocs documentation
 │

@@ -6,7 +6,7 @@ This document summarizes all enhancements implemented in version 0.12.0, represe
 ## Completed Enhancements
 
 ### ✅ 1. Critical Bug Fix (Issue #1)
-**File:** `hoymiles_mqtt/__main__.py` (old version, line 203)
+**File:** `hoymiles_smiles/__main__.py` (old version, line 203)
 
 **Problem:** Line 203 incorrectly set `reconnect_delay` twice instead of setting `reconnect_delay_max`
 
@@ -16,7 +16,7 @@ This document summarizes all enhancements implemented in version 0.12.0, represe
 
 ### ✅ 2. Configuration System Enhancement
 **New Files:**
-- `hoymiles_mqtt/config.py` - Complete Pydantic-based configuration system
+- `hoymiles_smiles/config.py` - Complete Pydantic-based configuration system
 
 **Features:**
 - Type-safe configuration with validation
@@ -30,7 +30,7 @@ This document summarizes all enhancements implemented in version 0.12.0, represe
 
 ### ✅ 3. Persistent MQTT Connection
 **New Files:**
-- `hoymiles_mqtt/mqtt_client.py` - Enhanced MQTT client
+- `hoymiles_smiles/mqtt_client.py` - Enhanced MQTT client
 
 **Improvements:**
 - Replaced single-shot publishes with persistent connection
@@ -48,7 +48,7 @@ This document summarizes all enhancements implemented in version 0.12.0, represe
 
 ### ✅ 4. Data Persistence Layer
 **New Files:**
-- `hoymiles_mqtt/persistence.py` - SQLite-based persistence
+- `hoymiles_smiles/persistence.py` - SQLite-based persistence
 
 **Features:**
 - SQLite database for production cache
@@ -64,7 +64,7 @@ This document summarizes all enhancements implemented in version 0.12.0, represe
 
 ### ✅ 5. Health Monitoring & Metrics
 **New Files:**
-- `hoymiles_mqtt/health.py` - Health check server and Prometheus metrics
+- `hoymiles_smiles/health.py` - Health check server and Prometheus metrics
 
 **Endpoints:**
 - `/health` - Complete health status (JSON)
@@ -85,7 +85,7 @@ This document summarizes all enhancements implemented in version 0.12.0, represe
 
 ### ✅ 6. Error Recovery & Circuit Breaker
 **New Files:**
-- `hoymiles_mqtt/circuit_breaker.py` - Circuit breaker pattern implementation
+- `hoymiles_smiles/circuit_breaker.py` - Circuit breaker pattern implementation
 
 **Features:**
 - Circuit breaker pattern (open/closed/half-open states)
@@ -114,7 +114,7 @@ RESET_HOUR=23
 
 ### ✅ 8. Multiple DTU Support
 **New Files:**
-- `hoymiles_mqtt/runners.py` (rewritten) - Multi-DTU coordinator
+- `hoymiles_smiles/runners.py` (rewritten) - Multi-DTU coordinator
 
 **Features:**
 - Monitor multiple DTUs simultaneously
@@ -137,8 +137,8 @@ dtu_configs:
 
 ### ✅ 9. Advanced Filtering & Transforms
 **Implementation in:**
-- `hoymiles_mqtt/ha.py` (enhanced)
-- `hoymiles_mqtt/config.py`
+- `hoymiles_smiles/ha.py` (enhanced)
+- `hoymiles_smiles/config.py`
 
 **Features:**
 - Exclude specific inverters by serial number
@@ -178,7 +178,7 @@ entity_friendly_names:
 
 ### ✅ 11. Structured Logging
 **New Files:**
-- `hoymiles_mqtt/logging_config.py` - Structured logging configuration
+- `hoymiles_smiles/logging_config.py` - Structured logging configuration
 
 **Features:**
 - JSON logging support
@@ -207,7 +207,7 @@ LOG_FILE=/data/hoymiles.log
 - `config.yaml.example` - YAML configuration template
 
 **Services:**
-- `hoymiles-mqtt` - Main application
+- `hoymiles-smiles` - Main application
 - `mosquitto` - MQTT broker
 - `homeassistant` - Home Assistant (profile: with-ha)
 - `prometheus` - Metrics collection (profile: with-monitoring)
@@ -291,7 +291,7 @@ pytest tests/
 
 ### New Files
 ```
-hoymiles_mqtt/
+hoymiles_smiles/
 ├── config.py                    # Configuration system
 ├── persistence.py               # Data persistence
 ├── health.py                    # Health monitoring
@@ -321,7 +321,7 @@ Documentation:
 
 ### Backup Files (Old Implementation)
 ```
-hoymiles_mqtt/
+hoymiles_smiles/
 ├── runners_old.py              # Original runners.py
 ├── __main___old.py             # Original __main__.py
 └── mqtt_old.py                 # Original mqtt.py
@@ -355,7 +355,7 @@ RESET_HOUR=23
 
 # Persistence
 PERSISTENCE_ENABLED=true
-DATABASE_PATH=/data/hoymiles-mqtt.db
+DATABASE_PATH=/data/hoymiles-smiles.db
 
 # Health
 HEALTH_ENABLED=true
@@ -401,7 +401,7 @@ curl http://localhost:8080/stats
 
 ### Dry Run
 ```bash
-DRY_RUN=true docker-compose up hoymiles-mqtt
+DRY_RUN=true docker-compose up hoymiles-smiles
 ```
 
 ---

@@ -24,9 +24,9 @@ echo -e "${BLUE}╚════════════════════�
 echo ""
 
 # Check if running from correct directory
-if [ ! -d "custom_components/hoymiles_mqtt" ]; then
-    echo -e "${RED}Error: custom_components/hoymiles_mqtt directory not found${NC}"
-    echo -e "${YELLOW}Please run this script from the hoymiles-mqtt-main directory${NC}"
+if [ ! -d "custom_components/hoymiles_smiles" ]; then
+    echo -e "${RED}Error: custom_components/hoymiles_smiles directory not found${NC}"
+    echo -e "${YELLOW}Please run this script from the hoymiles-smiles-main directory${NC}"
     exit 1
 fi
 
@@ -52,7 +52,7 @@ if [ ! -d "$CUSTOM_COMPONENTS_DIR" ]; then
 fi
 
 # Backup existing installation if it exists
-TARGET_DIR="$CUSTOM_COMPONENTS_DIR/hoymiles_mqtt"
+TARGET_DIR="$CUSTOM_COMPONENTS_DIR/hoymiles_smiles"
 if [ -d "$TARGET_DIR" ]; then
     BACKUP_DIR="${TARGET_DIR}.backup.$(date +%Y%m%d_%H%M%S)"
     echo -e "${YELLOW}Backing up existing installation to: ${BACKUP_DIR}${NC}"
@@ -62,7 +62,7 @@ fi
 
 # Copy the integration
 echo -e "${BLUE}Installing Hoymiles MQTT Custom Integration v1.1...${NC}"
-cp -r custom_components/hoymiles_mqtt "$CUSTOM_COMPONENTS_DIR/"
+cp -r custom_components/hoymiles_smiles "$CUSTOM_COMPONENTS_DIR/"
 
 # Verify installation
 if [ ! -f "$TARGET_DIR/manifest.json" ]; then

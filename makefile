@@ -1,4 +1,4 @@
-sources = hoymiles_mqtt
+sources = hoymiles_smiles
 
 .PHONY: test format lint unittest coverage pre-commit clean
 test: format lint unittest

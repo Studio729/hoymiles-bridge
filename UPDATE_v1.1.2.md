@@ -13,9 +13,9 @@
 ## What Changed
 
 ### Files Modified
-- `custom_components/hoymiles_mqtt/binary_sensor.py` - Added initial state write
-- `custom_components/hoymiles_mqtt/sensor.py` - Added initial state write
-- `custom_components/hoymiles_mqtt/manifest.json` - Version bumped to 1.1.2
+- `custom_components/hoymiles_smiles/binary_sensor.py` - Added initial state write
+- `custom_components/hoymiles_smiles/sensor.py` - Added initial state write
+- `custom_components/hoymiles_smiles/manifest.json` - Version bumped to 1.1.2
 
 ### Code Added
 ```python
@@ -59,8 +59,8 @@ Install integration → Sensor shows "on" → History shows "on"
 
 ### Step 1: Copy Updated Files
 ```bash
-cd /Users/tim/Downloads/hoymiles-mqtt-main
-cp -r custom_components/hoymiles_mqtt /config/custom_components/
+cd /Users/tim/Downloads/hoymiles-smiles-main
+cp -r custom_components/hoymiles_smiles /config/custom_components/
 ```
 
 ### Step 2: Restart Home Assistant

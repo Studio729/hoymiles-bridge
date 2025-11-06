@@ -4,12 +4,12 @@
 version: "3"
 
 services:
-  hoymiles_mqtt:
-    container_name: "hoymiles_mqtt"
+  hoymiles_smiles:
+    container_name: "hoymiles_smiles"
     build:
       context: .
       dockerfile: Dockerfile
-    image: hoymiles_mqtt
+    image: hoymiles_smiles
     network_mode: host
     environment:
       # ===== Required Settings (Your Original Config) =====
@@ -38,7 +38,7 @@ services:
       
       # Persistence (survives restarts)
       # PERSISTENCE_ENABLED: true
-      # DATABASE_PATH: /data/hoymiles-mqtt.db
+      # DATABASE_PATH: /data/hoymiles-smiles.db
       
       # Web Server / Health Monitoring
       # Access at http://your-ip:PORT/health

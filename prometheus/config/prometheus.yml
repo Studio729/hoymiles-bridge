@@ -1,4 +1,4 @@
-# Prometheus configuration for Hoymiles MQTT monitoring
+# Prometheus configuration for Hoymiles S-Miles monitoring
 
 global:
   scrape_interval: 15s
@@ -8,12 +8,12 @@ global:
 
 # Scrape configurations
 scrape_configs:
-  # Hoymiles MQTT Bridge metrics
-  - job_name: 'hoymiles-mqtt'
+  # Hoymiles S-Miles Bridge metrics
+  - job_name: 'hoymiles-smiles'
     static_configs:
-      - targets: ['hoymiles-mqtt:8080']
+      - targets: ['hoymiles-smiles:8080']
         labels:
-          service: 'hoymiles-mqtt'
+          service: 'hoymiles-smiles'
     metrics_path: '/metrics'
     scrape_interval: 30s
 
