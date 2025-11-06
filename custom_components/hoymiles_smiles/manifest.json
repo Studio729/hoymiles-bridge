@@ -1,0 +1,15 @@
+{
+  "domain": "hoymiles_smiles",
+  "name": "Hoymiles S-Miles",
+  "codeowners": ["@hoymiles-smiles"],
+  "config_flow": true,
+  "documentation": "https://github.com/hoymiles-smiles/hoymiles-smiles",
+  "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/hoymiles-smiles/hoymiles-smiles/issues",
+  "requirements": ["aiohttp>=3.9.0"],
+  "version": "2.0.0",
+  "dependencies": [],
+  "after_dependencies": [],
+  "integration_type": "device"
+}
+

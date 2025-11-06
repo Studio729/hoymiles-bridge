@@ -25,36 +25,33 @@ class DtuConfig(BaseModel):
         return v.strip()
 
 
-class MqttConfig(BaseModel):
-    """MQTT broker configuration."""
+class DatabaseConfig(BaseModel):
+    """Database configuration."""
 
-    broker: str = Field(..., description="MQTT broker address")
-    port: int = Field(default=1883, ge=1, le=65535, description="MQTT broker port")
-    user: Optional[str] = Field(default=None, description="MQTT username")
-    password: Optional[str] = Field(default=None, description="MQTT password")
-    password_file: Optional[Path] = Field(default=None, description="Path to file containing MQTT password")
-    tls: bool = Field(default=False, description="Enable TLS")
-    tls_insecure: bool = Field(default=False, description="Allow insecure TLS (do not use in production)")
-    tls_ca_cert: Optional[Path] = Field(default=None, description="Path to CA certificate for TLS")
-    client_id: str = Field(default="hoymiles-mqtt", description="MQTT client ID")
-    keepalive: int = Field(default=60, ge=5, description="MQTT keepalive interval in seconds")
-    qos: int = Field(default=1, ge=0, le=2, description="MQTT QoS level")
-    topic_prefix: str = Field(default="homeassistant", description="MQTT topic prefix")
+    type: str = Field(default="postgres", description="Database type (postgres)")
+    host: str = Field(default="localhost", description="Database host")
+    port: int = Field(default=5432, ge=1, le=65535, description="Database port")
+    database: str = Field(default="hoymiles", description="Database name")
+    user: str = Field(default="hoymiles", description="Database user")
+    password: str = Field(default="", description="Database password")
+    pool_size: int = Field(default=10, ge=1, description="Connection pool size")
+    max_overflow: int = Field(default=20, ge=0, description="Maximum pool overflow")
     
-    @model_validator(mode='after')
-    def load_password_from_file(self) -> 'MqttConfig':
-        """Load password from file if password_file is specified."""
-        if self.password_file and self.password_file.exists():
-            self.password = self.password_file.read_text().strip()
-        return self
-    
-    @field_validator('broker')
+    @field_validator('host')
     @classmethod
-    def validate_broker(cls, v: str) -> str:
-        """Validate broker is not empty."""
+    def validate_host(cls, v: str) -> str:
+        """Validate host is not empty."""
         if not v or not v.strip():
-            raise ValueError("MQTT broker cannot be empty")
+            raise ValueError("Database host cannot be empty")
         return v.strip()
+    
+    @field_validator('type')
+    @classmethod
+    def validate_type(cls, v: str) -> str:
+        """Validate database type."""
+        if v.lower() not in ['postgres', 'postgresql']:
+            raise ValueError("Only PostgreSQL is supported")
+        return 'postgres'
 
 
 class ModbusConfig(BaseModel):
@@ -117,8 +114,6 @@ class PersistenceConfig(BaseModel):
     """Data persistence configuration."""
 
     enabled: bool = Field(default=True, description="Enable data persistence")
-    database_path: Path = Field(default=Path("/data/hoymiles-mqtt.db"), description="SQLite database path")
-    backup_on_shutdown: bool = Field(default=True, description="Backup database on shutdown")
 
 
 class HealthConfig(BaseModel):
@@ -188,19 +183,16 @@ class AppConfig(BaseSettings):
     dtu_host: Optional[str] = Field(default=None, description="Single DTU host (legacy)")
     dtu_port: int = Field(default=502, description="Single DTU port (legacy)")
     dtu_configs: List[DtuConfig] = Field(default=[], description="Multiple DTU configurations")
-    microinverter_type: Optional[str] = Field(default=None, description="Microinverter type (e.g., 'HM', 'HMS', 'HMT')")
     
-    # MQTT configuration
-    mqtt_broker: Optional[str] = Field(default=None, description="MQTT broker address")
-    mqtt_port: int = Field(default=1883, description="MQTT broker port")
-    mqtt_user: Optional[str] = Field(default=None, description="MQTT username")
-    mqtt_password: Optional[str] = Field(default=None, description="MQTT password")
-    mqtt_password_file: Optional[str] = Field(default=None, description="MQTT password file")
-    mqtt_tls: bool = Field(default=False, description="Enable MQTT TLS")
-    mqtt_tls_insecure: bool = Field(default=False, description="MQTT TLS insecure")
-    mqtt_tls_ca_cert: Optional[str] = Field(default=None, description="MQTT TLS CA certificate")
-    mqtt_client_id: str = Field(default="hoymiles-mqtt", description="MQTT client ID")
-    mqtt_topic_prefix: str = Field(default="homeassistant", description="MQTT topic prefix")
+    # Database configuration
+    db_type: str = Field(default="postgres", description="Database type")
+    db_host: str = Field(default="localhost", description="Database host")
+    db_port: int = Field(default=5432, description="Database port")
+    db_name: str = Field(default="hoymiles", description="Database name")
+    db_user: str = Field(default="hoymiles", description="Database user")
+    db_password: str = Field(default="", description="Database password")
+    db_pool_size: int = Field(default=10, description="Database connection pool size")
+    db_max_overflow: int = Field(default=20, description="Database max overflow")
     
     # Modbus configuration
     modbus_unit_id: int = Field(default=1, description="Modbus unit ID")
@@ -224,7 +216,6 @@ class AppConfig(BaseSettings):
     
     # Persistence
     persistence_enabled: bool = Field(default=True, description="Enable persistence")
-    database_path: str = Field(default="/data/hoymiles-mqtt.db", description="Database path")
     
     # Health check
     health_enabled: bool = Field(default=True, description="Enable health check")
@@ -252,19 +243,17 @@ class AppConfig(BaseSettings):
     dump_data: bool = Field(default=False, description="Dump raw data to file")
     dump_data_path: Optional[Path] = Field(default=None, description="Data dump file path")
 
-    def get_mqtt_config(self) -> MqttConfig:
-        """Get MQTT configuration object."""
-        return MqttConfig(
-            broker=self.mqtt_broker or "localhost",
-            port=self.mqtt_port,
-            user=self.mqtt_user,
-            password=self.mqtt_password,
-            password_file=Path(self.mqtt_password_file) if self.mqtt_password_file else None,
-            tls=self.mqtt_tls,
-            tls_insecure=self.mqtt_tls_insecure,
-            tls_ca_cert=Path(self.mqtt_tls_ca_cert) if self.mqtt_tls_ca_cert else None,
-            client_id=self.mqtt_client_id,
-            topic_prefix=self.mqtt_topic_prefix,
+    def get_database_config(self) -> DatabaseConfig:
+        """Get database configuration object."""
+        return DatabaseConfig(
+            type=self.db_type,
+            host=self.db_host,
+            port=self.db_port,
+            database=self.db_name,
+            user=self.db_user,
+            password=self.db_password,
+            pool_size=self.db_pool_size,
+            max_overflow=self.db_max_overflow,
         )
     
     def get_dtu_configs(self) -> List[DtuConfig]:
@@ -323,7 +312,6 @@ class AppConfig(BaseSettings):
         """Get persistence configuration."""
         return PersistenceConfig(
             enabled=self.persistence_enabled,
-            database_path=Path(self.database_path),
         )
     
     def get_health_config(self) -> HealthConfig:
@@ -351,9 +339,9 @@ class AppConfig(BaseSettings):
         if not self.dtu_host and not self.dtu_configs:
             raise ValueError("At least one DTU must be configured")
         
-        # Ensure MQTT broker is configured
-        if not self.mqtt_broker:
-            raise ValueError("MQTT broker must be configured")
+        # Ensure database is configured
+        if self.persistence_enabled and not self.db_host:
+            raise ValueError("Database host must be configured when persistence is enabled")
         
         return self
 

@@ -1,4 +1,4 @@
-"""Data update coordinator for Hoymiles MQTT Bridge."""
+"""Data update coordinator for Hoymiles S-Miles."""
 from __future__ import annotations
 
 import asyncio
@@ -12,13 +12,13 @@ import async_timeout
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
-from .const import DOMAIN, ENDPOINT_HEALTH, ENDPOINT_STATS
+from .const import DOMAIN, ENDPOINT_HEALTH, ENDPOINT_STATS, ENDPOINT_INVERTERS
 
 _LOGGER = logging.getLogger(__name__)
 
 
 class HoymilesMqttCoordinator(DataUpdateCoordinator[dict[str, Any]]):
-    """Coordinator to manage data fetching from Hoymiles MQTT health API."""
+    """Coordinator to manage data fetching from Hoymiles S-Miles API."""
 
     def __init__(
         self,
@@ -26,13 +26,22 @@ class HoymilesMqttCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         host: str,
         port: int,
         scan_interval: int,
+        entry_id: str,
     ) -> None:
         """Initialize the coordinator."""
         self.host = host
         self.port = port
         self.base_url = f"http://{host}:{port}"
+        self.entry_id = entry_id
         self._session: aiohttp.ClientSession | None = None
         self._consecutive_failures = 0
+        self._last_push_update: float = 0
+        self._push_data: dict[str, Any] | None = None
+        self._ws: Any = None  # WebSocket connection from bridge
+        
+        # Generate authentication token for WebSocket
+        import secrets
+        self._ws_token = secrets.token_urlsafe(32)
         
         super().__init__(
             hass,
@@ -57,9 +66,29 @@ class HoymilesMqttCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         return self._session
 
     async def _async_update_data(self) -> dict[str, Any]:
-        """Fetch data from API."""
+        """Fetch data from API (used as fallback when push updates are stale)."""
         import time
         start_time = time.time()
+        
+        # Check if we have recent push data (less than 2x the update interval)
+        time_since_push = time.time() - self._last_push_update
+        max_push_age = self.update_interval.total_seconds() * 2
+        
+        if self._push_data and time_since_push < max_push_age:
+            _LOGGER.debug(
+                "[Push Data] Using pushed data (age: %.1fs, max: %.1fs)",
+                time_since_push, max_push_age
+            )
+            return self._push_data
+        
+        # Fall back to polling if push data is stale or missing
+        if self._push_data:
+            _LOGGER.info(
+                "[Fallback Poll] Push data is stale (%.1fs old), falling back to polling",
+                time_since_push
+            )
+        else:
+            _LOGGER.debug("[Poll] No push data available, polling API")
         
         _LOGGER.debug(
             "[API Call Start] Fetching data from %s:%s (session_active=%s, consecutive_failures=%d)",
@@ -85,6 +114,11 @@ class HoymilesMqttCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                 _LOGGER.debug("[API Call] Received stats data: records=%s", 
                              stats_data.get("total_records"))
                 
+                # Fetch inverters data with retry
+                _LOGGER.debug("[API Call] Fetching %s from %s:%s", ENDPOINT_INVERTERS, self.host, self.port)
+                inverters_data = await self._fetch_endpoint_with_retry(session, ENDPOINT_INVERTERS)
+                _LOGGER.debug("[API Call] Received inverters data: count=%s", len(inverters_data) if inverters_data else 0)
+                
                 # Reset failure counter on success
                 if self._consecutive_failures > 0:
                     _LOGGER.info(
@@ -103,6 +137,7 @@ class HoymilesMqttCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                 return {
                     "health": health_data,
                     "stats": stats_data,
+                    "inverters": inverters_data or [],
                     "available": True,
                 }
         except asyncio.TimeoutError as err:
@@ -245,9 +280,141 @@ class HoymilesMqttCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             return health["dtus"][dtu_name]
         return None
 
+    def get_inverters(self) -> list[dict[str, Any]]:
+        """Get all inverters data from coordinator."""
+        if self.data and "inverters" in self.data:
+            return self.data["inverters"]
+        return []
+
+    async def get_inverter_latest_data(self, serial_number: str) -> dict[str, Any] | None:
+        """Get latest data for a specific inverter including port data."""
+        try:
+            session = await self._get_session()
+            endpoint = f"/api/inverters/{serial_number}"
+            
+            # Fetch inverter data
+            inverter_data = await self._fetch_endpoint(session, endpoint)
+            
+            # Fetch port data
+            ports_endpoint = f"{endpoint}/ports"
+            try:
+                ports_data = await self._fetch_endpoint(session, ports_endpoint)
+                inverter_data["ports"] = ports_data
+            except Exception as err:
+                _LOGGER.debug("Could not fetch port data for %s: %s", serial_number, err)
+                inverter_data["ports"] = []
+            
+            return inverter_data
+        except Exception as err:
+            _LOGGER.error("Failed to get inverter data for %s: %s", serial_number, err)
+            return None
+
     def is_available(self) -> bool:
         """Check if the API is available."""
         return self.data is not None and self.data.get("available", False)
+
+    async def async_handle_push_update(self, data: dict[str, Any]) -> None:
+        """Handle pushed data update from webhook.
+        
+        Args:
+            data: Pushed data from the bridge
+        """
+        import time
+        
+        _LOGGER.debug(
+            "[Push Update] Received push update with %d inverters",
+            len(data.get("inverters", []))
+        )
+        
+        # Store push data
+        self._push_data = {
+            "health": data.get("health", {}),
+            "stats": data.get("stats", {}),
+            "inverters": data.get("inverters", []),
+            "available": True,
+        }
+        self._last_push_update = time.time()
+        
+        # Reset consecutive failures on successful push
+        if self._consecutive_failures > 0:
+            _LOGGER.info("Push update received, resetting failure count")
+            self._consecutive_failures = 0
+        
+        # Update coordinator data and notify listeners
+        self.async_set_updated_data(self._push_data)
+        
+        _LOGGER.debug("[Push Update] Successfully processed push update")
+
+    def get_ws_token(self) -> str:
+        """Get WebSocket authentication token."""
+        return self._ws_token
+    
+    def get_websocket_url(self) -> str:
+        """Get WebSocket URL for bridge to connect to."""
+        # Get Home Assistant external URL or internal URL
+        from homeassistant.helpers.network import get_url
+        
+        try:
+            base_url = get_url(self.hass, prefer_external=False)
+        except Exception:
+            # Fallback to internal URL
+            base_url = f"http://{self.hass.config.internal_url or 'homeassistant.local:8123'}"
+        
+        # Construct WebSocket URL
+        ws_url = base_url.replace("http://", "ws://").replace("https://", "wss://")
+        return f"{ws_url}/api/hoymiles_smiles/ws?token={self._ws_token}"
+    
+    def set_websocket(self, ws: Any) -> None:
+        """Set WebSocket connection.
+        
+        Args:
+            ws: WebSocket connection or None to clear
+        """
+        self._ws = ws
+        if ws:
+            _LOGGER.info("WebSocket connection established")
+        else:
+            _LOGGER.info("WebSocket connection closed")
+    
+    async def register_websocket_with_bridge(self, ws_url: str) -> None:
+        """Send WebSocket URL to bridge for connection.
+        
+        Args:
+            ws_url: Full WebSocket URL for the bridge to connect to
+        """
+        try:
+            session = await self._get_session()
+            endpoint = "/api/websocket/register"
+            url = f"{self.base_url}{endpoint}"
+            
+            payload = {
+                "websocket_url": ws_url,
+                "name": "Home Assistant",
+            }
+            
+            _LOGGER.debug("[WebSocket Registration] Sending to %s", url)
+            
+            async with session.post(url, json=payload) as response:
+                if response.status == 200:
+                    _LOGGER.info(
+                        "Successfully registered WebSocket URL with bridge"
+                    )
+                elif response.status == 404:
+                    _LOGGER.warning(
+                        "Bridge does not support WebSocket registration endpoint. "
+                        "Push updates will not work, falling back to polling only."
+                    )
+                else:
+                    _LOGGER.warning(
+                        "Failed to register WebSocket with bridge (HTTP %d). "
+                        "Falling back to polling only.",
+                        response.status
+                    )
+        except Exception as err:
+            _LOGGER.warning(
+                "Could not register WebSocket with bridge: %s. Falling back to polling only.",
+                err
+            )
 
     async def async_shutdown(self) -> None:
         """Shutdown coordinator and cleanup resources."""

@@ -1,4 +1,4 @@
-"""Binary sensor platform for Hoymiles MQTT Bridge."""
+"""Binary sensor platform for Hoymiles S-Miles."""
 from __future__ import annotations
 
 import logging

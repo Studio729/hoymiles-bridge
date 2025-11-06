@@ -1,9 +1,9 @@
 [tool]
 [tool.poetry]
-name = "hoymiles-mqtt"
-version = "0.12.0"
-homepage = "https://github.com/wasilukm/hoymiles-mqtt"
-description = "Send data from Hoymiles photovoltaic installation to MQTT server."
+name = "hoymiles-smiles"
+version = "1.0.0"
+homepage = "https://github.com/wasilukm/hoymiles-smiles"
+description = "Hoymiles S-Miles: Store and monitor data from Hoymiles photovoltaic installations."
 authors = ["Mariusz Wasiluk"]
 readme = "README.md"
 license =  "MIT"
@@ -20,6 +20,7 @@ classifiers=[
 ]
 packages = [
     { include = "hoymiles_mqtt" },
+    { include = "custom_components/hoymiles_smiles" },
     { include = "tests", format = "sdist" },
 ]
 
@@ -27,7 +28,8 @@ packages = [
 python = ">=3.10,<3.14"
 
 # Core dependencies
-paho-mqtt = "^2.1.0"
+psycopg2-binary = "^2.9.9"
+asyncpg = "^0.29.0"
 hoymiles-modbus = "^0.10.0"
 ConfigArgParse = "^1.5.3"
 pydantic = "^2.9.0"

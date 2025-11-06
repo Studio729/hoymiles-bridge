@@ -13,13 +13,13 @@ from hoymiles_mqtt.circuit_breaker import ErrorRecoveryManager
 from hoymiles_mqtt.config import AppConfig
 from hoymiles_mqtt.health import HealthCheckServer, HealthMetrics
 from hoymiles_mqtt.logging_config import setup_logging
-from hoymiles_mqtt.mqtt_client import EnhancedMqttClient
 from hoymiles_mqtt.persistence import PersistenceManager
-from hoymiles_mqtt.runners_new import (
+from hoymiles_mqtt.runners import (
     MultiDtuCoordinator,
     run_periodic_coordinator,
     setup_signal_handlers,
 )
+from hoymiles_mqtt.websocket_client import WebSocketClient
 
 logger = logging.getLogger(__name__)
 
@@ -159,7 +159,7 @@ def main():
     )
     
     logger.info("=" * 60)
-    logger.info(f"Hoymiles MQTT Bridge v{__version__}")
+    logger.info(f"Hoymiles S-Miles Bridge v{__version__}")
     logger.info("=" * 60)
     
     # Validate configuration
@@ -175,8 +175,8 @@ def main():
     for dtu in dtu_configs:
         logger.info(f"  - {dtu.name}: {dtu.host}:{dtu.port}")
     
-    mqtt_config = config.get_mqtt_config()
-    logger.info(f"MQTT Broker: {mqtt_config.broker}:{mqtt_config.port}")
+    db_config = config.get_database_config()
+    logger.info(f"Database: {db_config.type}://{db_config.host}:{db_config.port}/{db_config.database}")
     logger.info(f"Query Period: {config.query_period}s")
     logger.info(f"Timezone: {config.timezone}")
     logger.info(f"Reset Hour: {config.reset_hour}:00")
@@ -189,38 +189,23 @@ def main():
     
     # Persistence
     persistence_config = config.get_persistence_config()
+    db_config = config.get_database_config()
+    
     persistence_manager = PersistenceManager(
-        database_path=persistence_config.database_path,
         enabled=persistence_config.enabled,
+        host=db_config.host,
+        port=db_config.port,
+        database=db_config.database,
+        user=db_config.user,
+        password=db_config.password,
     )
     
     # Health metrics
     health_metrics = HealthMetrics()
     
-    # MQTT client
-    mqtt_client = EnhancedMqttClient(
-        broker=mqtt_config.broker,
-        port=mqtt_config.port,
-        user=mqtt_config.user,
-        password=mqtt_config.password,
-        client_id=mqtt_config.client_id,
-        tls=mqtt_config.tls,
-        tls_insecure=mqtt_config.tls_insecure,
-        tls_ca_cert=mqtt_config.tls_ca_cert,
-        keepalive=mqtt_config.keepalive,
-        qos=mqtt_config.qos,
-    )
-    
-    # Connect to MQTT
-    if not config.dry_run:
-        logger.info("Connecting to MQTT broker...")
-        if not mqtt_client.connect():
-            logger.error("Failed to connect to MQTT broker")
-            sys.exit(1)
-        
-        # Start publisher thread
-        mqtt_client.start_publisher()
-        logger.info("MQTT publisher started")
+    # WebSocket client for push updates
+    websocket_client = WebSocketClient(enabled=True)
+    logger.info("WebSocket client initialized for push updates")
     
     # Error recovery
     error_recovery = ErrorRecoveryManager(config)
@@ -228,10 +213,10 @@ def main():
     # Multi-DTU coordinator
     coordinator = MultiDtuCoordinator(
         config=config,
-        mqtt_client=mqtt_client,
         persistence_manager=persistence_manager,
         health_metrics=health_metrics,
         error_recovery=error_recovery,
+        websocket_client=websocket_client,
     )
     
     # Health check server
@@ -242,6 +227,7 @@ def main():
             port=config.health_port,
             health_metrics=health_metrics,
             persistence_manager=persistence_manager,
+            websocket_client=websocket_client,
         )
         health_server.start()
     
@@ -267,17 +253,21 @@ def main():
         if health_server:
             health_server.stop()
         
-        if not config.dry_run:
-            logger.info("Flushing MQTT messages...")
-            mqtt_client.flush(timeout=5)
-            mqtt_client.stop_publisher()
-            mqtt_client.disconnect()
+        # Close WebSocket client
+        if websocket_client:
+            logger.info("Closing WebSocket client...")
+            import asyncio
+            try:
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                loop.run_until_complete(websocket_client.close())
+                loop.close()
+            except Exception as e:
+                logger.error(f"Error closing WebSocket client: {e}")
         
-        # Backup and close persistence
+        # Close persistence
         if persistence_manager:
             logger.info("Closing persistence...")
-            if persistence_config.backup_on_shutdown:
-                persistence_manager.backup_database()
             persistence_manager.close()
         
         logger.info("Shutdown complete")

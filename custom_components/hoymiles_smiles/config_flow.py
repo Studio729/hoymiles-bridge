@@ -1,4 +1,4 @@
-"""Config flow for Hoymiles MQTT Bridge integration."""
+"""Config flow for Hoymiles S-Miles integration."""
 from __future__ import annotations
 
 import asyncio

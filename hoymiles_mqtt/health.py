@@ -227,6 +227,7 @@ class HealthCheckHandler(BaseHTTPRequestHandler):
     
     health_metrics: Optional[HealthMetrics] = None
     persistence_manager: Optional[Any] = None
+    websocket_client: Optional[Any] = None
     
     def log_message(self, format: str, *args) -> None:
         """Override to use Python logging."""
@@ -246,10 +247,26 @@ class HealthCheckHandler(BaseHTTPRequestHandler):
                 self._handle_metrics()
             elif self.path == '/stats':
                 self._handle_stats()
+            elif self.path.startswith('/api/'):
+                self._handle_api()
             else:
                 self.send_error(404, "Not Found")
         except Exception as e:
             logger.error(f"Error handling request {self.path}: {e}", exc_info=True)
+            try:
+                self.send_error(500, "Internal Server Error")
+            except:
+                pass  # Connection may be closed
+    
+    def do_POST(self) -> None:
+        """Handle POST requests."""
+        try:
+            if self.path == '/api/websocket/register':
+                self._handle_websocket_register()
+            else:
+                self.send_error(404, "Not Found")
+        except Exception as e:
+            logger.error(f"Error handling POST {self.path}: {e}", exc_info=True)
             try:
                 self.send_error(500, "Internal Server Error")
             except:
@@ -293,13 +310,160 @@ class HealthCheckHandler(BaseHTTPRequestHandler):
             self.wfile.write(json.dumps(stats, indent=2).encode())
         else:
             self.send_error(503, "Persistence manager not available")
+    
+    def _handle_api(self) -> None:
+        """Handle API endpoints for sensor data."""
+        if not self.persistence_manager:
+            self.send_error(503, "Persistence manager not available")
+            return
+        
+        try:
+            # Parse path
+            parts = self.path.split('/')
+            
+            if self.path == '/api/inverters':
+                # Get all inverters
+                inverters = self.persistence_manager.get_all_inverters()
+                self._send_json_response(inverters)
+            
+            elif self.path.startswith('/api/inverters/') and len(parts) >= 4:
+                serial_number = parts[3]
+                
+                if len(parts) == 4:
+                    # Get latest data for specific inverter
+                    inverter_data = self.persistence_manager.get_latest_inverter_data(
+                        serial_number=serial_number, 
+                        limit=1
+                    )
+                    if inverter_data:
+                        self._send_json_response(inverter_data[0])
+                    else:
+                        self.send_error(404, "Inverter not found")
+                
+                elif parts[4] == 'history':
+                    # Get historical data
+                    limit = 100
+                    if '?limit=' in self.path:
+                        try:
+                            limit = int(self.path.split('?limit=')[1].split('&')[0])
+                        except:
+                            pass
+                    
+                    inverter_data = self.persistence_manager.get_latest_inverter_data(
+                        serial_number=serial_number,
+                        limit=limit
+                    )
+                    self._send_json_response(inverter_data)
+                
+                elif parts[4] == 'ports':
+                    # Get all ports for inverter
+                    port_data = self.persistence_manager.get_latest_port_data(
+                        serial_number=serial_number,
+                        limit=10
+                    )
+                    self._send_json_response(port_data)
+                
+                else:
+                    self.send_error(404, "Not Found")
+            
+            elif self.path == '/api/ports':
+                # Get all port data
+                port_data = self.persistence_manager.get_latest_port_data(limit=100)
+                self._send_json_response(port_data)
+            
+            elif self.path == '/api/production/current':
+                # Get current production cache
+                cache = self.persistence_manager.load_production_cache()
+                # Convert tuple keys to dict format
+                production_data = []
+                for (serial, port), (today, total) in cache.items():
+                    production_data.append({
+                        'serial_number': serial,
+                        'port_number': port,
+                        'today_production': today,
+                        'total_production': total
+                    })
+                self._send_json_response(production_data)
+            
+            else:
+                self.send_error(404, "Not Found")
+                
+        except Exception as e:
+            logger.error(f"Error handling API request {self.path}: {e}", exc_info=True)
+            self.send_error(500, str(e))
+    
+    def _handle_websocket_register(self) -> None:
+        """Handle WebSocket registration endpoint."""
+        if not self.websocket_client:
+            self.send_error(503, "WebSocket client not available")
+            return
+        
+        try:
+            # Read request body
+            content_length = int(self.headers.get('Content-Length', 0))
+            body = self.rfile.read(content_length)
+            data = json.loads(body.decode('utf-8'))
+            
+            websocket_url = data.get('websocket_url')
+            name = data.get('name', 'Unknown')
+            
+            if not websocket_url:
+                self.send_error(400, "Missing websocket_url")
+                return
+            
+            # Register WebSocket (use asyncio.run_coroutine_threadsafe for thread safety)
+            import asyncio
+            import threading
+            
+            # Get the event loop from the main thread
+            loop = asyncio.new_event_loop()
+            
+            def register_in_thread():
+                asyncio.set_event_loop(loop)
+                loop.run_until_complete(
+                    self.websocket_client.register_websocket(websocket_url, name)
+                )
+                loop.close()
+            
+            thread = threading.Thread(target=register_in_thread, daemon=True)
+            thread.start()
+            thread.join(timeout=5)
+            
+            logger.info(f"Registered WebSocket: {name} -> {websocket_url}")
+            
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(json.dumps({"status": "registered"}).encode())
+            
+        except json.JSONDecodeError as e:
+            logger.error(f"Invalid JSON in WebSocket registration: {e}")
+            self.send_error(400, "Invalid JSON")
+        except Exception as e:
+            logger.error(f"Error registering WebSocket: {e}", exc_info=True)
+            self.send_error(500, str(e))
+    
+    def _send_json_response(self, data: Any, default=str) -> None:
+        """Send JSON response with proper serialization.
+        
+        Args:
+            data: Data to serialize
+            default: Default serializer for complex types
+        """
+        self.send_response(200)
+        self.send_header('Content-type', 'application/json')
+        self.send_header('Access-Control-Allow-Origin', '*')  # Allow CORS for Home Assistant
+        self.end_headers()
+        self.wfile.write(json.dumps(data, indent=2, default=default).encode())
 
 
 class HealthCheckServer:
     """HTTP server for health checks and metrics."""
     
     def __init__(self, host: str, port: int, health_metrics: HealthMetrics,
-                 persistence_manager: Optional[Any] = None):
+                 persistence_manager: Optional[Any] = None,
+                 websocket_client: Optional[Any] = None):
         """Initialize health check server.
         
         Args:
@@ -307,11 +471,13 @@ class HealthCheckServer:
             port: Server port
             health_metrics: Health metrics instance
             persistence_manager: Optional persistence manager
+            websocket_client: Optional WebSocket client
         """
         self.host = host
         self.port = port
         self.health_metrics = health_metrics
         self.persistence_manager = persistence_manager
+        self.websocket_client = websocket_client
         self.server: Optional[HTTPServer] = None
         self.thread: Optional[threading.Thread] = None
     
@@ -321,6 +487,7 @@ class HealthCheckServer:
             # Set class variables for handler
             HealthCheckHandler.health_metrics = self.health_metrics
             HealthCheckHandler.persistence_manager = self.persistence_manager
+            HealthCheckHandler.websocket_client = self.websocket_client
             
             self.server = HTTPServer((self.host, self.port), HealthCheckHandler)
             
@@ -332,6 +499,7 @@ class HealthCheckServer:
             logger.info(f"  Ready: http://{self.host}:{self.port}/ready")
             logger.info(f"  Metrics: http://{self.host}:{self.port}/metrics")
             logger.info(f"  Stats: http://{self.host}:{self.port}/stats")
+            logger.info(f"  API: http://{self.host}:{self.port}/api/...")
             
         except Exception as e:
             logger.error(f"Failed to start health check server: {e}")

@@ -1,4 +1,4 @@
-"""The Hoymiles MQTT Bridge integration."""
+"""The Hoymiles S-Miles integration."""
 from __future__ import annotations
 
 import logging
@@ -9,14 +9,16 @@ from homeassistant.core import HomeAssistant
 
 from .const import CONF_HOST, CONF_PORT, CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL, DOMAIN
 from .coordinator import HoymilesMqttCoordinator
+from .websocket_server import async_setup_websocket
 
 _LOGGER = logging.getLogger(__name__)
 
 PLATFORMS: list[Platform] = [Platform.BINARY_SENSOR, Platform.SENSOR]
+WEBSOCKET_SETUP_DONE = "websocket_setup_done"
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Set up Hoymiles MQTT Bridge from a config entry."""
+    """Set up Hoymiles S-Miles from a config entry."""
     host = entry.data[CONF_HOST]
     port = entry.data[CONF_PORT]
     scan_interval = entry.options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
@@ -26,6 +28,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         host=host,
         port=port,
         scan_interval=scan_interval,
+        entry_id=entry.entry_id,
     )
 
     # Fetch initial data
@@ -34,6 +37,20 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # Store coordinator
     hass.data.setdefault(DOMAIN, {})
     hass.data[DOMAIN][entry.entry_id] = coordinator
+
+    # Setup WebSocket server (only once for all integrations)
+    if WEBSOCKET_SETUP_DONE not in hass.data[DOMAIN]:
+        await async_setup_websocket(hass)
+        hass.data[DOMAIN][WEBSOCKET_SETUP_DONE] = True
+
+    # Send WebSocket connection info to bridge
+    ws_url = coordinator.get_websocket_url()
+    await coordinator.register_websocket_with_bridge(ws_url)
+    
+    _LOGGER.info(
+        "WebSocket available for push updates at: %s",
+        ws_url
+    )
 
     # Forward setup to platforms
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
@@ -50,7 +67,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     if unload_ok:
         coordinator: HoymilesMqttCoordinator = hass.data[DOMAIN].pop(entry.entry_id)
-        # Cleanup coordinator resources
+        # Cleanup coordinator resources (closes WebSocket if connected)
         await coordinator.async_shutdown()
 
     return unload_ok
