@@ -294,3 +294,51 @@ ATTR_DTU_LAST_ERROR: Final = "dtu_last_error"
 ATTR_DTU_LAST_ERROR_TIME: Final = "dtu_last_error_time"
 ATTR_CIRCUIT_BREAKER_STATE: Final = "circuit_breaker_state"
 
+# Status code mappings
+OPERATING_STATUS_MAP: Final = {
+    0: "Normal",
+    1: "Starting",
+    2: "Standby",
+    3: "Normal Operation",
+    4: "Fault",
+    5: "Permanent Fault",
+    6: "Communication Interrupted",
+    7: "Unknown",
+}
+
+LINK_STATUS_MAP: Final = {
+    0: "Disconnected",
+    1: "Connected",
+    2: "Poor Signal",
+    3: "Good Signal",
+    4: "Excellent Signal",
+}
+
+# Common Hoymiles alarm codes
+ALARM_CODE_MAP: Final = {
+    0: "No Alarm",
+    1: "Inverter Over Temperature",
+    2: "DC Over Voltage",
+    3: "AC Over Voltage",
+    4: "AC Under Voltage",
+    5: "Over Frequency",
+    6: "Under Frequency",
+    121: "Over Temperature Protection",
+    122: "Under Temperature Protection",
+    123: "DC Over Current",
+    124: "DC Over Voltage",
+    125: "Grid Configuration Parameter Error",
+    126: "AC Over Current",
+    127: "Grid Over Voltage",
+    128: "Grid Under Voltage",
+    129: "Grid Over Frequency",
+    130: "Grid Under Frequency",
+    131: "Islanding Detected",
+    141: "Inverter Fault",
+    142: "Internal Communication Error",
+    143: "Hardware Fault",
+    144: "AFCI Self Check Error",
+    201: "Waiting for Grid",
+    205: "Grid Abnormal",
+}
+

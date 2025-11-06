@@ -26,6 +26,9 @@ from .const import (
     INVERTER_AGGREGATE_SENSORS,
     PORT_SENSOR_TYPES,
     DTU_SENSOR_TYPES,
+    OPERATING_STATUS_MAP,
+    LINK_STATUS_MAP,
+    ALARM_CODE_MAP,
 )
 from .coordinator import HoymilesMqttCoordinator
 
@@ -450,13 +453,16 @@ class InverterSensor(CoordinatorEntity[HoymilesMqttCoordinator], SensorEntity):
             return round(value, 1) if value else None
         
         elif self._sensor_key == "operating_status":
-            return self._latest_data.get("operating_status")
+            code = self._latest_data.get("operating_status")
+            return OPERATING_STATUS_MAP.get(code, f"Unknown ({code})")
         
         elif self._sensor_key == "link_status":
-            return self._latest_data.get("link_status")
+            code = self._latest_data.get("link_status")
+            return LINK_STATUS_MAP.get(code, f"Unknown ({code})")
         
         elif self._sensor_key == "alarm_code":
-            return self._latest_data.get("alarm_code")
+            code = self._latest_data.get("alarm_code")
+            return ALARM_CODE_MAP.get(code, f"Unknown Alarm ({code})")
         
         elif self._sensor_key == "alarm_count":
             return self._latest_data.get("alarm_count")
@@ -479,6 +485,14 @@ class InverterSensor(CoordinatorEntity[HoymilesMqttCoordinator], SensorEntity):
         ports = self._latest_data.get("ports", [])
         if ports:
             attributes["port_count"] = len(ports)
+        
+        # Add raw numeric codes for status sensors
+        if self._sensor_key == "operating_status":
+            attributes["status_code"] = self._latest_data.get("operating_status")
+        elif self._sensor_key == "link_status":
+            attributes["status_code"] = self._latest_data.get("link_status")
+        elif self._sensor_key == "alarm_code":
+            attributes["alarm_code_raw"] = self._latest_data.get("alarm_code")
         
         return attributes
 
