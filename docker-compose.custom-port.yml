@@ -1,0 +1,43 @@
+# Example: Using Custom Web Server Port
+# This example shows how to use a different port for the health/metrics endpoint
+
+version: "3"
+
+services:
+  hoymiles_mqtt:
+    container_name: "hoymiles_mqtt"
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: hoymiles_mqtt
+    network_mode: host
+    environment:
+      # Required Settings
+      MQTT_BROKER: 192.168.1.31
+      DTU_HOST: 192.168.1.194
+      MICROINVERTER_TYPE: 'HM'
+      QUERY_PERIOD: 300
+      
+      # Web Server Configuration - Using Port 9090 instead of default 8080
+      HEALTH_ENABLED: true
+      HEALTH_PORT: 9090          # ← Custom port (default is 8080)
+      METRICS_ENABLED: true
+      
+      # Optional: Enable other features
+      PERSISTENCE_ENABLED: true
+      LOG_LEVEL: INFO
+    
+    volumes:
+      - ./data:/data
+    
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+    
+    restart: unless-stopped
+
+# Access endpoints at:
+# - Health: http://192.168.1.31:9090/health
+# - Metrics: http://192.168.1.31:9090/metrics
+# - Stats: http://192.168.1.31:9090/stats
+# - Ready: http://192.168.1.31:9090/ready
+

@@ -1,0 +1,62 @@
+version: "3"
+
+services:
+  hoymiles_mqtt:
+    container_name: "hoymiles_mqtt"
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: hoymiles_mqtt
+    network_mode: host
+    environment:
+      # MQTT Configuration
+      MQTT_BROKER: 192.168.1.31
+      MQTT_PORT: 1883
+      MQTT_USER: 
+      MQTT_PASSWORD: 
+      MQTT_TLS: false
+      MQTT_CLIENT_ID: hoymiles-mqtt
+      MQTT_TOPIC_PREFIX: homeassistant
+      
+      # DTU Configuration
+      DTU_HOST: 192.168.1.194
+      DTU_PORT: 502
+      MODBUS_UNIT_ID: 1
+      MICROINVERTER_TYPE: 'HM'
+      
+      # Modbus Communication
+      COMM_TIMEOUT: 3
+      COMM_RETRIES: 3
+      COMM_RECONNECT_DELAY: 0
+      COMM_RECONNECT_DELAY_MAX: 300
+      
+      # Timing
+      QUERY_PERIOD: 300
+      EXPIRE_AFTER: 0
+      RESET_HOUR: 23
+      TIMEZONE: UTC
+      
+      # Persistence
+      PERSISTENCE_ENABLED: true
+      DATABASE_PATH: /data/hoymiles-mqtt.db
+      
+      # Web Server / Health Check Endpoint
+      HEALTH_ENABLED: true
+      HEALTH_HOST: 0.0.0.0
+      HEALTH_PORT: 8080               # Change this to use a different port
+      METRICS_ENABLED: true
+      
+      # Logging
+      LOG_LEVEL: INFO
+      LOG_FORMAT: standard
+      LOG_TO_CONSOLE: true
+      
+      # Error Recovery
+      EXPONENTIAL_BACKOFF: true
+      CIRCUIT_BREAKER_THRESHOLD: 5
+    volumes:
+      - ./data:/data
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+    restart: unless-stopped
+

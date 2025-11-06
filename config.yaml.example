@@ -1,0 +1,114 @@
+# Hoymiles MQTT Configuration File Example
+# This file supports more advanced configurations like multiple DTUs
+# Place this file at ./config/config.yaml when using Docker
+
+# ===== MQTT Configuration =====
+mqtt_broker: mosquitto
+mqtt_port: 1883
+mqtt_user: null
+mqtt_password: null
+mqtt_tls: false
+mqtt_client_id: hoymiles-mqtt
+mqtt_topic_prefix: homeassistant
+
+# ===== Multiple DTU Configuration =====
+# When using multiple DTUs, define them here instead of using DTU_HOST
+# dtu_configs:
+#   - name: "DTU_East"
+#     host: "192.168.1.100"
+#     port: 502
+#     unit_id: 1
+#   - name: "DTU_West"
+#     host: "192.168.1.101"
+#     port: 502
+#     unit_id: 1
+
+# ===== Single DTU Configuration =====
+# Or use simple single DTU mode (backwards compatible)
+dtu_host: "192.168.1.100"
+dtu_port: 502
+modbus_unit_id: 1
+
+# ===== Modbus Communication =====
+comm_timeout: 3
+comm_retries: 3
+comm_reconnect_delay: 0
+comm_reconnect_delay_max: 300
+
+# ===== Timing Configuration =====
+query_period: 60
+expire_after: 0
+reset_hour: 23
+timezone: "UTC"
+
+# Examples:
+# timezone: "America/New_York"
+# timezone: "Europe/London"
+# timezone: "Asia/Tokyo"
+
+# ===== Entity Filtering =====
+# Microinverter entities
+mi_entities:
+  - grid_voltage
+  - grid_frequency
+  - temperature
+  - operating_status
+  - alarm_code
+  - alarm_count
+  - link_status
+
+# Port/panel entities
+port_entities:
+  - pv_voltage
+  - pv_current
+  - pv_power
+  - today_production
+  - total_production
+
+# Exclude specific inverters by serial number
+exclude_inverters: []
+# Example: exclude_inverters: ["123456789", "987654321"]
+
+# Value multipliers (e.g., to convert W to kW)
+value_multipliers: {}
+# Example:
+# value_multipliers:
+#   pv_power: 0.001  # Convert W to kW
+
+# Custom friendly names
+entity_friendly_names: {}
+# Example:
+# entity_friendly_names:
+#   grid_voltage: "AC Voltage"
+#   pv_power: "Solar Power"
+
+# ===== Persistence =====
+persistence_enabled: true
+database_path: "/data/hoymiles-mqtt.db"
+
+# ===== Health Monitoring =====
+health_enabled: true
+health_host: "0.0.0.0"
+health_port: 8080
+metrics_enabled: true
+
+# ===== Alerts =====
+alerts_enabled: false
+dtu_offline_threshold: 300
+temperature_threshold: 80.0
+
+# ===== Logging =====
+log_level: "INFO"
+log_format: "standard"  # or "json"
+log_to_console: true
+log_file: null
+
+# ===== Error Recovery =====
+exponential_backoff: true
+circuit_breaker_threshold: 5
+
+# ===== Advanced Options =====
+dry_run: false
+dump_data: false
+dump_data_path: null
+

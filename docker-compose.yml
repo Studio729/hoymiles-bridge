@@ -1,0 +1,153 @@
+version: '3.8'
+
+services:
+  # Mosquitto MQTT Broker
+  mosquitto:
+    image: eclipse-mosquitto:2.0
+    container_name: hoymiles-mosquitto
+    restart: unless-stopped
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./mosquitto/config:/mosquitto/config
+      - ./mosquitto/data:/mosquitto/data
+      - ./mosquitto/log:/mosquitto/log
+    networks:
+      - hoymiles-network
+
+  # Hoymiles MQTT Bridge
+  hoymiles-mqtt:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hoymiles-mqtt
+    restart: unless-stopped
+    depends_on:
+      - mosquitto
+    environment:
+      # MQTT Configuration
+      MQTT_BROKER: mosquitto
+      MQTT_PORT: 1883
+      MQTT_USER: ${MQTT_USER:-}
+      MQTT_PASSWORD: ${MQTT_PASSWORD:-}
+      MQTT_TLS: ${MQTT_TLS:-false}
+      MQTT_CLIENT_ID: ${MQTT_CLIENT_ID:-hoymiles-mqtt}
+      MQTT_TOPIC_PREFIX: ${MQTT_TOPIC_PREFIX:-homeassistant}
+      
+      # DTU Configuration (single DTU mode)
+      DTU_HOST: ${DTU_HOST:-192.168.1.100}
+      DTU_PORT: ${DTU_PORT:-502}
+      MODBUS_UNIT_ID: ${MODBUS_UNIT_ID:-1}
+      
+      # Modbus Communication
+      COMM_TIMEOUT: ${COMM_TIMEOUT:-3}
+      COMM_RETRIES: ${COMM_RETRIES:-3}
+      COMM_RECONNECT_DELAY: ${COMM_RECONNECT_DELAY:-0}
+      COMM_RECONNECT_DELAY_MAX: ${COMM_RECONNECT_DELAY_MAX:-300}
+      
+      # Timing
+      QUERY_PERIOD: ${QUERY_PERIOD:-60}
+      EXPIRE_AFTER: ${EXPIRE_AFTER:-0}
+      RESET_HOUR: ${RESET_HOUR:-23}
+      TIMEZONE: ${TIMEZONE:-UTC}
+      
+      # Persistence
+      PERSISTENCE_ENABLED: ${PERSISTENCE_ENABLED:-true}
+      DATABASE_PATH: /data/hoymiles-mqtt.db
+      
+      # Health Check
+      HEALTH_ENABLED: ${HEALTH_ENABLED:-true}
+      HEALTH_HOST: 0.0.0.0
+      HEALTH_PORT: 8080
+      METRICS_ENABLED: ${METRICS_ENABLED:-true}
+      
+      # Logging
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      LOG_FORMAT: ${LOG_FORMAT:-standard}
+      LOG_TO_CONSOLE: ${LOG_TO_CONSOLE:-true}
+      
+      # Error Recovery
+      EXPONENTIAL_BACKOFF: ${EXPONENTIAL_BACKOFF:-true}
+      CIRCUIT_BREAKER_THRESHOLD: ${CIRCUIT_BREAKER_THRESHOLD:-5}
+    volumes:
+      - ./data:/data
+      - ./config:/config
+    ports:
+      - "8080:8080"  # Health check and metrics
+    networks:
+      - hoymiles-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/ready"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Home Assistant (optional)
+  homeassistant:
+    image: ghcr.io/home-assistant/home-assistant:stable
+    container_name: hoymiles-homeassistant
+    restart: unless-stopped
+    depends_on:
+      - mosquitto
+    environment:
+      - TZ=${TIMEZONE:-UTC}
+    volumes:
+      - ./homeassistant:/config
+    ports:
+      - "8123:8123"
+    networks:
+      - hoymiles-network
+    profiles:
+      - with-ha
+
+  # Prometheus (optional - for metrics collection)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: hoymiles-prometheus
+    restart: unless-stopped
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    volumes:
+      - ./prometheus/config:/etc/prometheus
+      - ./prometheus/data:/prometheus
+    ports:
+      - "9090:9090"
+    networks:
+      - hoymiles-network
+    profiles:
+      - with-monitoring
+
+  # Grafana (optional - for metrics visualization)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: hoymiles-grafana
+    restart: unless-stopped
+    depends_on:
+      - prometheus
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+      - GF_INSTALL_PLUGINS=grafana-clock-panel
+    volumes:
+      - ./grafana/data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    ports:
+      - "3000:3000"
+    networks:
+      - hoymiles-network
+    profiles:
+      - with-monitoring
+
+networks:
+  hoymiles-network:
+    driver: bridge
+
+volumes:
+  mosquitto-data:
+  mosquitto-log:
+  homeassistant-config:
+  prometheus-data:
+  grafana-data:
+
