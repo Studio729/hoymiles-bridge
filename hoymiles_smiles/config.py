@@ -132,6 +132,25 @@ class HealthConfig(BaseModel):
     metrics_enabled: bool = Field(default=True, description="Enable Prometheus metrics")
 
 
+class InfluxDBConfig(BaseModel):
+    """InfluxDB v3 configuration."""
+
+    enabled: bool = Field(default=False, description="Enable InfluxDB v3 integration")
+    host: str = Field(default="", description="InfluxDB host URL (e.g., https://influxdb3.example.com)")
+    token: str = Field(default="", description="InfluxDB API token")
+    database: str = Field(default="hoymiles", description="InfluxDB database/bucket name")
+    org: Optional[str] = Field(default=None, description="InfluxDB organization (optional for v3)")
+    
+    @field_validator('host')
+    @classmethod
+    def validate_host_if_enabled(cls, v: str, info) -> str:
+        """Validate host is provided if enabled."""
+        # Note: info.data contains other fields being validated
+        if v and not v.startswith(('http://', 'https://')):
+            raise ValueError("InfluxDB host must start with http:// or https://")
+        return v.strip() if v else ""
+
+
 class AlertsConfig(BaseModel):
     """Alerting configuration."""
 
@@ -245,6 +264,13 @@ class AppConfig(BaseSettings):
     exponential_backoff: bool = Field(default=True, description="Use exponential backoff")
     circuit_breaker_threshold: int = Field(default=5, description="Circuit breaker threshold")
     
+    # InfluxDB configuration
+    influxdb_enabled: bool = Field(default=False, description="Enable InfluxDB v3")
+    influxdb_host: str = Field(default="", description="InfluxDB host URL")
+    influxdb_token: str = Field(default="", description="InfluxDB API token")
+    influxdb_database: str = Field(default="hoymiles", description="InfluxDB database name")
+    influxdb_org: Optional[str] = Field(default=None, description="InfluxDB organization")
+    
     # Advanced options
     dry_run: bool = Field(default=False, description="Dry run mode (no publishing)")
     dump_data: bool = Field(default=False, description="Dump raw data to file")
@@ -337,6 +363,16 @@ class AppConfig(BaseSettings):
             format=self.log_format,
             file=Path(self.log_file) if self.log_file else None,
             console=self.log_to_console,
+        )
+    
+    def get_influxdb_config(self) -> InfluxDBConfig:
+        """Get InfluxDB configuration."""
+        return InfluxDBConfig(
+            enabled=self.influxdb_enabled,
+            host=self.influxdb_host,
+            token=self.influxdb_token,
+            database=self.influxdb_database,
+            org=self.influxdb_org,
         )
 
     @model_validator(mode='after')

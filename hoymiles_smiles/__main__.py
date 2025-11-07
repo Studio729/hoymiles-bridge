@@ -12,6 +12,7 @@ from hoymiles_smiles import __version__
 from hoymiles_smiles.circuit_breaker import ErrorRecoveryManager
 from hoymiles_smiles.config import AppConfig
 from hoymiles_smiles.health import HealthCheckServer, HealthMetrics
+from hoymiles_smiles.influxdb_client import InfluxDBWriter
 from hoymiles_smiles.logging_config import setup_logging
 from hoymiles_smiles.persistence import PersistenceManager
 from hoymiles_smiles.runners import (
@@ -193,6 +194,22 @@ def main():
     websocket_client = WebSocketClient(enabled=True)
     logger.info("WebSocket client initialized for push updates")
     
+    # InfluxDB writer (optional)
+    influxdb_config = config.get_influxdb_config()
+    influxdb_writer = None
+    if influxdb_config.enabled:
+        influxdb_writer = InfluxDBWriter(
+            enabled=True,
+            host=influxdb_config.host,
+            token=influxdb_config.token,
+            database=influxdb_config.database,
+            org=influxdb_config.org,
+        )
+        if influxdb_writer.enabled:
+            logger.info(f"InfluxDB writer initialized: {influxdb_config.host}/{influxdb_config.database}")
+        else:
+            logger.warning("InfluxDB writer failed to initialize")
+    
     # Error recovery
     error_recovery = ErrorRecoveryManager(config)
     
@@ -202,6 +219,7 @@ def main():
         persistence_manager=persistence_manager,
         health_metrics=health_metrics,
         error_recovery=error_recovery,
+        influxdb_writer=influxdb_writer,
         websocket_client=websocket_client,
     )
     
@@ -238,6 +256,11 @@ def main():
         # Stop components
         if health_server:
             health_server.stop()
+        
+        # Close InfluxDB writer
+        if influxdb_writer:
+            logger.info("Closing InfluxDB writer...")
+            influxdb_writer.close()
         
         # Close WebSocket client
         if websocket_client:

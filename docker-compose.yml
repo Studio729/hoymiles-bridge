@@ -75,6 +75,13 @@ services:
       # Error Recovery
       EXPONENTIAL_BACKOFF: ${EXPONENTIAL_BACKOFF:-true}
       CIRCUIT_BREAKER_THRESHOLD: ${CIRCUIT_BREAKER_THRESHOLD:-5}
+      
+      # InfluxDB v3 Integration (Optional)
+      INFLUXDB_ENABLED: ${INFLUXDB_ENABLED:-false}
+      INFLUXDB_HOST: ${INFLUXDB_HOST:-}
+      INFLUXDB_TOKEN: ${INFLUXDB_TOKEN:-}
+      INFLUXDB_DATABASE: ${INFLUXDB_DATABASE:-hoymiles}
+      INFLUXDB_ORG: ${INFLUXDB_ORG:-}
     volumes:
       - ./config:/config
     ports:

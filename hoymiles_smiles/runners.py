@@ -15,6 +15,7 @@ from hoymiles_smiles.circuit_breaker import ErrorRecoveryManager
 from hoymiles_smiles.config import AppConfig, DtuConfig
 from hoymiles_smiles.health import HealthMetrics
 from hoymiles_smiles.persistence import PersistenceManager
+from hoymiles_smiles.influxdb_client import InfluxDBWriter
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +30,7 @@ class DtuQueryJob:
         health_metrics: HealthMetrics,
         error_recovery: ErrorRecoveryManager,
         persistence_manager: PersistenceManager,
+        influxdb_writer: Optional[InfluxDBWriter],
         config: AppConfig,
     ):
         """Initialize DTU query job.
@@ -39,6 +41,7 @@ class DtuQueryJob:
             health_metrics: Health metrics tracker
             error_recovery: Error recovery manager
             persistence_manager: Database persistence manager
+            influxdb_writer: InfluxDB writer (optional)
             config: Application configuration
         """
         self.dtu_config = dtu_config
@@ -46,6 +49,7 @@ class DtuQueryJob:
         self.health_metrics = health_metrics
         self.error_recovery = error_recovery
         self.persistence = persistence_manager
+        self.influxdb = influxdb_writer
         self.config = config
         self._lock = threading.Lock()
     
@@ -135,7 +139,7 @@ class DtuQueryJob:
             raise
     
     def _save_plant_data(self, plant_data) -> None:
-        """Save plant data to database.
+        """Save plant data to database and InfluxDB.
         
         Args:
             plant_data: PlantData object from DTU
@@ -143,6 +147,12 @@ class DtuQueryJob:
         try:
             # plant_data is a PlantData object, not a dict
             inverters = plant_data.inverters if hasattr(plant_data, 'inverters') else []
+            
+            # Calculate DTU-level totals for InfluxDB
+            total_pv_power = 0.0
+            total_today_production = 0
+            total_total_production = 0
+            has_alarms = False
             
             for inverter in inverters:
                 serial_number = inverter.serial_number
@@ -160,22 +170,42 @@ class DtuQueryJob:
                     'link_status': getattr(inverter, 'link_status', None),
                 }
                 
-                # Save inverter data
+                # Save inverter data to database
                 self.persistence.save_inverter_data(
                     serial_number=serial_number,
                     dtu_name=self.dtu_config.name,
                     data=inverter_data,
                 )
                 
+                # Write to InfluxDB
+                if self.influxdb:
+                    self.influxdb.write_inverter_data(
+                        serial_number=serial_number,
+                        dtu_name=self.dtu_config.name,
+                        data=inverter_data,
+                    )
+                
                 # Save port data
                 port_num = getattr(inverter, 'port_number', 1)
+                pv_power = getattr(inverter, 'pv_power', 0) or 0
+                today_prod = getattr(inverter, 'today_production', 0) or 0
+                total_prod = getattr(inverter, 'total_production', 0) or 0
+                
                 port_data = {
                     'pv_voltage': getattr(inverter, 'pv_voltage', None),
                     'pv_current': getattr(inverter, 'pv_current', None),
-                    'pv_power': getattr(inverter, 'pv_power', None),
-                    'today_production': getattr(inverter, 'today_production', 0),
-                    'total_production': getattr(inverter, 'total_production', 0),
+                    'pv_power': pv_power,
+                    'today_production': today_prod,
+                    'total_production': total_prod,
                 }
+                
+                # Accumulate totals
+                total_pv_power += float(pv_power)
+                total_today_production += int(today_prod)
+                total_total_production += int(total_prod)
+                
+                if getattr(inverter, 'alarm_count', 0) > 0:
+                    has_alarms = True
                 
                 self.persistence.save_port_data(
                     serial_number=serial_number,
@@ -183,15 +213,39 @@ class DtuQueryJob:
                     data=port_data,
                 )
                 
+                # Write port data to InfluxDB
+                if self.influxdb:
+                    self.influxdb.write_port_data(
+                        serial_number=serial_number,
+                        port_number=port_num,
+                        dtu_name=self.dtu_config.name,
+                        data=port_data,
+                    )
+                
                 # Update production cache
                 self.persistence.save_production_cache(
                     serial_number=serial_number,
                     port_number=port_num,
-                    today_production=port_data['today_production'],
-                    total_production=port_data['total_production'],
+                    today_production=today_prod,
+                    total_production=total_prod,
                 )
             
-            logger.debug(f"Saved data for {len(inverters)} inverters to database")
+            # Write DTU-level data to InfluxDB
+            if self.influxdb and inverters:
+                dtu_serial = getattr(plant_data, 'dtu_sn', 'unknown')
+                dtu_data = {
+                    'pv_power': total_pv_power,
+                    'today_production': total_today_production,
+                    'total_production': total_total_production,
+                    'alarm_flag': 'ON' if has_alarms else 'OFF',
+                }
+                self.influxdb.write_dtu_data(
+                    dtu_name=self.dtu_config.name,
+                    dtu_serial=dtu_serial,
+                    data=dtu_data,
+                )
+            
+            logger.debug(f"Saved data for {len(inverters)} inverters to database and InfluxDB")
             
         except Exception as e:
             logger.error(f"Error saving plant data: {e}", exc_info=True)
@@ -206,6 +260,7 @@ class MultiDtuCoordinator:
         persistence_manager: PersistenceManager,
         health_metrics: HealthMetrics,
         error_recovery: ErrorRecoveryManager,
+        influxdb_writer: Optional[InfluxDBWriter] = None,
         websocket_client: Optional[Any] = None,
     ):
         """Initialize multi-DTU coordinator.
@@ -215,12 +270,14 @@ class MultiDtuCoordinator:
             persistence_manager: Database persistence manager
             health_metrics: Health metrics tracker
             error_recovery: Error recovery manager
+            influxdb_writer: Optional InfluxDB writer
             websocket_client: Optional WebSocket client for push updates
         """
         self.config = config
         self.persistence = persistence_manager
         self.health_metrics = health_metrics
         self.error_recovery = error_recovery
+        self.influxdb = influxdb_writer
         self.websocket_client = websocket_client
         self.jobs: List[DtuQueryJob] = []
         self.last_reset_check = datetime.now()
@@ -249,6 +306,7 @@ class MultiDtuCoordinator:
                     health_metrics=self.health_metrics,
                     error_recovery=self.error_recovery,
                     persistence_manager=self.persistence,
+                    influxdb_writer=self.influxdb,
                     config=self.config,
                 )
                 
