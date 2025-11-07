@@ -24,9 +24,7 @@ services:
 
   # Hoymiles S-Miles Bridge
   hoymiles-smiles:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ghcr.io/studio729/hoymiles-bridge:latest
     container_name: hoymiles-smiles
     restart: unless-stopped
     depends_on:
